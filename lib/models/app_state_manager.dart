@@ -3,13 +3,14 @@ import 'package:feeds/models/models.dart';
 import 'package:flutter/material.dart';
 
 class FeedsTab {
-  static const int unread = 0;
-  static const int starred = 1;
+  static const int allFeeds = 0;
+  static const int unread = 1;
+  static const int starred = 2;
 }
 
 class AppStateManager extends ChangeNotifier {
   bool _initialized = false;
-  int _selectedTab = FeedsTab.unread;
+  int _selectedTab = FeedsTab.allFeeds;
 
   bool get isInitialized => _initialized;
   int get selectedTab => _selectedTab;

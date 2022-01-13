@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:feeds/features/allfeeds/all_feeds_page.dart';
 import 'package:feeds/features/unread/unread_page.dart';
 import 'package:feeds/features/starred/starred_page.dart';
 import 'package:feeds/models/models.dart';
@@ -17,6 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static List<Widget> pages = [
+    const AllFeedsPage(),
     const UnreadPage(),
     const StarredPage(),
   ];
@@ -27,6 +29,9 @@ class _HomePageState extends State<HomePage> {
         builder: (context, appStateManager, child) {
       String title;
       switch (appStateManager.selectedTab) {
+        case FeedsTab.allFeeds:
+          title = 'All Feeds';
+          break;
         case FeedsTab.unread:
           title = 'Unread';
           break;
@@ -54,6 +59,10 @@ class _HomePageState extends State<HomePage> {
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Theme.of(context).colorScheme.secondary,
           items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
+              label: 'All feeds',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined),
               label: 'Unread',
