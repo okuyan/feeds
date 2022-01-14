@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:feeds/models/models.dart';
 import 'package:feeds/navigation/navigation.dart';
 import 'package:feeds/feeds_theme.dart';
+import 'package:feeds/app_state_manager.dart';
 
 void main() {
   appStateManager.initializedApp();

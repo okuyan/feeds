@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:feeds/models/models.dart';
 import 'package:flutter/material.dart';
 
 class FeedsTab {

@@ -1,10 +1,10 @@
-import 'package:feeds/features/home/home_page.dart';
+import 'package:feeds/ui/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:feeds/features/splash/splash_page.dart';
+import 'package:feeds/ui/splash/splash_page.dart';
 
 class Routes {
   static final splash = GoRoute(

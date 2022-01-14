@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:feeds/features/allfeeds/all_feeds_page.dart';
-import 'package:feeds/features/unread/unread_page.dart';
-import 'package:feeds/features/starred/starred_page.dart';
-import 'package:feeds/models/models.dart';
+import 'package:feeds/ui/allfeeds/all_feeds_page.dart';
+import 'package:feeds/ui/unread/unread_page.dart';
+import 'package:feeds/ui/starred/starred_page.dart';
+//import 'package:feeds/models/models.dart';
+import 'package:feeds/app_state_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
