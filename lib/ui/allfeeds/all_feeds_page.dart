@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:feeds/network/feed_service.dart';
@@ -48,10 +47,16 @@ class _AllFeedsPageState extends State<AllFeedsPage> {
 
           for (RssItem rssItem in _items) {
             Article article = Article(
-                title: rssItem.toString(), link: rssItem.link.toString());
+                title: rssItem.title.toString(), link: rssItem.link.toString());
             _articles.add(article);
           }
         }
+
+        // Check to see if list has been populated
+        for (Article article in _articles) {
+          print('List contains: ${article.title}');
+        }
+
         return _buildArticleList(context, _articles);
       },
     );
