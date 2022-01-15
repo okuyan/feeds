@@ -6,19 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:feeds/network/feed_service.dart';
 import 'package:feeds/models/models.dart';
 
-/*
-class AllFeedsPage extends StatelessWidget {
-  const AllFeedsPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('all feeds'),
-    );
-  }
-}
-*/
-
 class AllFeedsPage extends StatefulWidget {
   const AllFeedsPage({Key? key}) : super(key: key);
 
@@ -31,23 +18,43 @@ class _AllFeedsPageState extends State<AllFeedsPage> {
 
   List<Article> _articles = [];
 
-  // Get the Medium RSSFeed data
-  Future<RssFeed?> getRSSFeedData() async {
-    try {
-      final client = http.Client();
-      final response =
-          await client.get(Uri.parse('https://blog.salrashid.dev/index.xml'));
-      return RssFeed.parse(response.body);
-    } catch (e) {
-      print(e);
-    }
-    return null;
+  @override
+  void initState() {
+    super.initState();
   }
 
-  updateFeed(feed) {
-    setState(() {
-      _rssFeed = feed;
-    });
+  Future<RssFeed> getFeedData() async {
+    final feedData = await FeedService().getFeed();
+    return feedData;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(color: Colors.white, child: _buildFeedLoader(context));
+  }
+
+  Widget _buildFeedLoader(BuildContext context) {
+    return FutureBuilder<RssFeed>(
+      future: getFeedData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(snapshot.error.toString(),
+                textAlign: TextAlign.center, textScaleFactor: 1.3),
+          );
+        }
+        if (snapshot.hasData && snapshot.data!.items!.isNotEmpty) {
+          final List<RssItem> _items = snapshot.data!.items!;
+
+          for (RssItem rssItem in _items) {
+            Article article = Article(
+                title: rssItem.toString(), link: rssItem.link.toString());
+            _articles.add(article);
+          }
+        }
+        return _buildArticleList(context, _articles);
+      },
+    );
   }
 
   Future<void> launchArticle(String url) async {
@@ -57,70 +64,25 @@ class _AllFeedsPageState extends State<AllFeedsPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Clear old data in the list
-    _articles.clear();
-
-    getRSSFeedData().then((feed) {
-      // Update the _feed variable
-      updateFeed(feed);
-
-      // print feed Metadata
-      print('FEED METADATA');
-      print('------------------');
-      print('Link: ${feed!.link}');
-      print('Description: ${feed.description}');
-      print('Docs: ${feed.docs}');
-      print('Last build data: ${feed.lastBuildDate}');
-      print('Number of items: ${feed.items!.length}');
-
-      // Get the data for each item in the feed
-      if (feed.items!.isNotEmpty) {
-        /// Get the title of each item
-        for (RssItem rssItem in feed.items!) {
-          // Only print the titles of the articles: comments do not have a description (subtitle), but articles do
-          if (rssItem.description != null) {
-            // Create a new Medium article from the rssitem
-            Article mediumArticle = Article(
-                title: rssItem.title.toString(), link: rssItem.link.toString());
-
-            // Add the article to the list
-            _articles.add(mediumArticle);
-          }
-        }
-      }
-
-      // Check to see if list has been populated
-      for (Article article in _articles) {
-        print('List contains: ${article.title}');
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildArticleList(
+      BuildContext articleListContext, List<Article> articles) {
     return Scaffold(
       appBar: AppBar(
         title: Text('salrashid blog feed'),
         centerTitle: true,
       ),
       body: ListView.builder(
-        itemCount: _articles.length,
-        padding: EdgeInsets.all(8),
-        itemBuilder: (BuildContext buildContext, int index) {
-          return Container(
-            child: ListTile(
-              title: Text(_articles[index].title),
-//              subtitle: Text(_articles[index].datePublished),
-              onTap: () => launchArticle(_articles[index].link),
-              trailing: Icon(Icons.arrow_right),
-            ),
-          );
-        },
-      ),
+          itemCount: _articles.length,
+//          padding: EdgeInsets.all(8),
+          itemBuilder: (BuildContext buildContext, int index) {
+            return Container(
+              child: ListTile(
+                title: Text(_articles[index].title),
+                onTap: () => launchArticle(_articles[index].link),
+                trailing: Icon(Icons.arrow_right),
+              ),
+            );
+          }),
     );
   }
 }
