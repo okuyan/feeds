@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:feeds/ui/allfeeds/all_feeds_page.dart';
+import 'package:feeds/ui/feeds/feeds_page.dart';
 import 'package:feeds/ui/unread/unread_page.dart';
 import 'package:feeds/ui/starred/starred_page.dart';
 //import 'package:feeds/models/models.dart';
@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static List<Widget> pages = [
-    const AllFeedsPage(),
+    const FeedsPage(),
     const UnreadPage(),
     const StarredPage(),
   ];

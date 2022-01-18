@@ -5,14 +5,19 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:feeds/network/feed_service.dart';
 import 'package:feeds/models/models.dart';
 
-class AllFeedsPage extends StatefulWidget {
-  const AllFeedsPage({Key? key}) : super(key: key);
+class ArticlesPage extends StatefulWidget {
+  const ArticlesPage({Key? key}) : super(key: key);
+
+  static Page page({LocalKey? key}) => MaterialPage<void>(
+        key: key,
+        child: const ArticlesPage(),
+      );
 
   @override
-  _AllFeedsPageState createState() => _AllFeedsPageState();
+  _FeedsItemsPageState createState() => _FeedsItemsPageState();
 }
 
-class _AllFeedsPageState extends State<AllFeedsPage> {
+class _FeedsItemsPageState extends State<ArticlesPage> {
   late RssFeed _rssFeed; // RSS Feed Object
 
   List<Article> _articles = [];
@@ -47,7 +52,9 @@ class _AllFeedsPageState extends State<AllFeedsPage> {
 
           for (RssItem rssItem in _items) {
             Article article = Article(
-                title: rssItem.title.toString(), link: rssItem.link.toString());
+                title: rssItem.title.toString(),
+                link: rssItem.link.toString(),
+                content: rssItem.description);
             _articles.add(article);
           }
         }
