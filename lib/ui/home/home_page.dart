@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:feeds/features/allfeeds/all_feeds_page.dart';
-import 'package:feeds/features/unread/unread_page.dart';
-import 'package:feeds/features/starred/starred_page.dart';
-import 'package:feeds/models/models.dart';
+import 'package:feeds/ui/feeds/feeds_page.dart';
+import 'package:feeds/ui/unread/unread_page.dart';
+import 'package:feeds/ui/starred/starred_page.dart';
+//import 'package:feeds/models/models.dart';
+import 'package:feeds/app_state_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static List<Widget> pages = [
-    const AllFeedsPage(),
+    const FeedsPage(),
     const UnreadPage(),
     const StarredPage(),
   ];
@@ -43,8 +44,8 @@ class _HomePageState extends State<HomePage> {
       }
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(227, 225, 224, 1.0),
-          title: Text(title, style: TextStyle(color: Colors.black)),
+          backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+          title: Text(title, style: const TextStyle(color: Colors.black87)),
           elevation: 0,
         ),
         body: SafeArea(

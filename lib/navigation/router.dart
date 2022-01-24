@@ -1,7 +1,7 @@
-import 'package:feeds/features/splash/splash_page.dart';
-import 'package:feeds/models/models.dart';
+import 'package:feeds/ui/splash/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:feeds/app_state_manager.dart';
 
 import 'routes.dart';
 

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FeedsTheme {
-  // 1
   static TextTheme lightTextTheme = TextTheme(
     bodyText1: GoogleFonts.openSans(
         fontSize: 14.0, fontWeight: FontWeight.w700, color: Colors.black),
+    bodyText2: GoogleFonts.openSans(
+        fontSize: 15.0, fontWeight: FontWeight.w400, color: Colors.black),
     subtitle1: GoogleFonts.openSans(
         fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.black),
     subtitle2: GoogleFonts.openSans(
@@ -18,7 +19,6 @@ class FeedsTheme {
         fontSize: 16.0, fontWeight: FontWeight.w600, color: Colors.black),
   );
 
-  // 2
   static TextTheme darkTextTheme = TextTheme(
     bodyText1: GoogleFonts.openSans(
         fontSize: 14.0, fontWeight: FontWeight.w600, color: Colors.white),
@@ -34,10 +34,9 @@ class FeedsTheme {
         fontSize: 16.0, fontWeight: FontWeight.w600, color: Colors.white),
   );
 
-  // 3
   static light() {
     return ThemeData(
-      canvasColor: Color.fromRGBO(227, 225, 224, 1.0),
+      canvasColor: const Color.fromRGBO(227, 225, 224, 1.0),
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSwatch().copyWith(
         primary: Colors.purple,
@@ -51,7 +50,6 @@ class FeedsTheme {
     );
   }
 
-  // 4
   static dark() {
     return ThemeData(
       brightness: Brightness.dark,

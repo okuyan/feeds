@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:feeds/models/models.dart';
 import 'package:flutter/material.dart';
 
 class FeedsTab {
@@ -16,7 +15,7 @@ class AppStateManager extends ChangeNotifier {
   int get selectedTab => _selectedTab;
 
   void initializedApp() {
-    Timer(const Duration(milliseconds: 3000), () {
+    Timer(const Duration(milliseconds: 2000), () {
       _initialized = true;
       notifyListeners();
     });
