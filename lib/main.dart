@@ -1,13 +1,15 @@
+import 'package:feeds/bootstrap.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as og_provider;
 
 import 'package:feeds/navigation/navigation.dart';
 import 'package:feeds/feeds_theme.dart';
 import 'package:feeds/app_state_manager.dart';
 
-void main() {
-  appStateManager.initializedApp();
-  runApp(const FeedsApp());
+Future<void> main() async {
+  await bootstrap();
+  runApp(const ProviderScope(child: FeedsApp()));
 }
 
 class FeedsApp extends StatelessWidget {
@@ -15,9 +17,10 @@ class FeedsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return og_provider.MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => appStateManager),
+        og_provider.ChangeNotifierProvider(
+            create: (context) => appStateManager),
       ],
       child: MaterialApp.router(
           title: 'Feeds',

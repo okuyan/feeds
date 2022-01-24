@@ -3,7 +3,7 @@ import 'package:webfeed/webfeed.dart';
 
 import 'package:feeds/network/result.dart';
 
-const String apiUrl = 'https://blog.salrashid.dev/index.xml';
+//const String apiUrl = 'https://blog.salrashid.dev/index.xml';
 
 class FeedService {
   Future getData(String url) async {
@@ -14,10 +14,11 @@ class FeedService {
     } else {
       // TODO error handling
       print(response.statusCode);
+      throw Error(Exception());
     }
   }
 
-  Future<RssFeed> getFeed() async {
+  Future<RssFeed> getFeed(String apiUrl) async {
     final feedData = await getData(apiUrl);
     return feedData;
   }

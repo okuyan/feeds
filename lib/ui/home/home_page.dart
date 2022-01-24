@@ -44,8 +44,8 @@ class _HomePageState extends State<HomePage> {
       }
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(227, 225, 224, 1.0),
-          title: Text(title, style: TextStyle(color: Colors.black)),
+          backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+          title: Text(title, style: const TextStyle(color: Colors.black87)),
           elevation: 0,
         ),
         body: SafeArea(
