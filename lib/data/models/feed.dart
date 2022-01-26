@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
 
 part 'feed.g.dart';
 
+@immutable
 @HiveType(typeId: 1)
 class Feed extends Equatable {
   @HiveField(0)

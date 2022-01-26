@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:feeds/feeds_theme.dart';
-import 'package:feeds/bootstrap.dart';
+import 'package:feeds/providers/app_providers.dart';
 
 class ArticlePage extends ConsumerWidget {
   const ArticlePage({Key? key}) : super(key: key);

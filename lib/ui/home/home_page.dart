@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:feeds/ui/feeds/feeds_page.dart';
 import 'package:feeds/ui/unread/unread_page.dart';
 import 'package:feeds/ui/starred/starred_page.dart';
-//import 'package:feeds/models/models.dart';
 import 'package:feeds/app_state_manager.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,37 +41,47 @@ class _HomePageState extends State<HomePage> {
         default:
           title = 'Unread';
       }
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
-          title: Text(title, style: const TextStyle(color: Colors.black87)),
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: IndexedStack(
-            index: appStateManager.selectedTab,
-            children: pages,
+      return SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+            title: Text(title, style: const TextStyle(color: Colors.black87)),
+            elevation: 0,
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: appStateManager.selectedTab,
-          onTap: appStateManager.goToTab,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Theme.of(context).colorScheme.secondary,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              label: 'All feeds',
+          body: RefreshIndicator(
+            displacement: 0.0,
+            color: Colors.black54,
+            backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+            child: SafeArea(
+              child: IndexedStack(
+                index: appStateManager.selectedTab,
+                children: pages,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              label: 'Unread',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.star),
-              label: 'Starred',
-            ),
-          ],
+            onRefresh: () {
+              return Future.delayed(const Duration(seconds: 1));
+            },
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: appStateManager.selectedTab,
+            onTap: appStateManager.goToTab,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Theme.of(context).colorScheme.secondary,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.article_outlined),
+                label: 'All feeds',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.article_outlined),
+                label: 'Unread',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.star),
+                label: 'Starred',
+              ),
+            ],
+          ),
         ),
       );
     });

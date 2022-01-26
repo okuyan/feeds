@@ -1,4 +1,3 @@
-import 'package:feeds/data/repository.dart';
 import 'package:riverpod/riverpod.dart';
 
 import 'package:feeds/data/models/models.dart';

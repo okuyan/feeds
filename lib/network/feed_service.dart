@@ -3,8 +3,6 @@ import 'package:webfeed/webfeed.dart';
 
 import 'package:feeds/network/result.dart';
 
-//const String apiUrl = 'https://blog.salrashid.dev/index.xml';
-
 class FeedService {
   Future getData(String url) async {
     print('Calling url: $url');

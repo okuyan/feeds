@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:feeds/data/models/models.dart';
-import 'package:feeds/bootstrap.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feeds/ui/feeds/article_page.dart';
+import 'package:feeds/providers/app_providers.dart';
 
 class ArticleListPage extends ConsumerWidget {
   const ArticleListPage({Key? key}) : super(key: key);
@@ -18,14 +18,15 @@ class ArticleListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // rebuild the widget when the article list changes
     List<Article> _articles = ref.watch(articleListProvider);
-    Feed? _selectedFeedProvider = ref.watch(selectedFeedProvider);
-    final _title = _selectedFeedProvider!.title;
+    Feed? _selectedFeed = ref.watch(selectedFeedProvider);
+    final _title = _selectedFeed!.title;
     return Scaffold(
         appBar: AppBar(
           iconTheme: const IconThemeData(color: Colors.black),
-          backgroundColor: Color.fromRGBO(227, 225, 224, 1.0),
-          title: Text(_title, style: TextStyle(color: Colors.black)),
+          backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+          title: Text(_title, style: const TextStyle(color: Colors.black)),
           elevation: 0,
         ),
         body: ListView.builder(
