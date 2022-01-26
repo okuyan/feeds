@@ -1,19 +1,12 @@
-import 'package:feeds/state/article_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:feeds/data/hive_repository.dart';
 import 'package:feeds/app_state_manager.dart';
-import 'package:feeds/state/feeds_manager.dart';
 import 'package:feeds/data/models/models.dart';
 import 'package:feeds/network/feed_service.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
-
-late StateNotifierProvider<FeedList, List<Feed>> feedListProvider;
-late StateNotifierProvider<ArticleList, List<Article>> articleListProvider;
-late StateProvider<Feed?> selectedFeedProvider;
-late StateProvider<Article?> selectedArticleProvider;
+import 'package:feeds/providers/app_providers.dart';
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,20 +85,9 @@ Future<void> bootstrap() async {
     }
   }
 
-  // TODO sort articles by pubDate
+  // Sort articles by pubDate
   _articles.sort((b, a) => a.pubDate.compareTo(b.pubDate));
 
-  feedListProvider = StateNotifierProvider<FeedList, List<Feed>>((ref) {
-    return FeedList(_feeds);
-  });
-
-  articleListProvider =
-      StateNotifierProvider<ArticleList, List<Article>>((ref) {
-    return ArticleList(_articles);
-  });
-
-  selectedFeedProvider = StateProvider<Feed?>((ref) => null);
-  selectedArticleProvider = StateProvider<Article?>((ref) => null);
-
+  initProviders(_feeds, _articles, unread);
   appStateManager.initializedApp();
 }
