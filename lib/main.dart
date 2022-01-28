@@ -1,6 +1,6 @@
 import 'package:feeds/bootstrap.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart' as og_provider;
 
 import 'package:feeds/navigation/navigation.dart';

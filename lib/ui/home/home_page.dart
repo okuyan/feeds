@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,6 +6,13 @@ import 'package:feeds/ui/feeds/feeds_page.dart';
 import 'package:feeds/ui/unread/unread_page.dart';
 import 'package:feeds/ui/starred/starred_page.dart';
 import 'package:feeds/app_state_manager.dart';
+import 'package:feeds/ui/feeds/add_feed_page.dart';
+
+/// Some keys used for testing
+final addFeedKey = UniqueKey();
+final activeFilterKey = UniqueKey();
+final completedFilterKey = UniqueKey();
+final allFilterKey = UniqueKey();
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -47,6 +55,21 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
             title: Text(title, style: const TextStyle(color: Colors.black87)),
             elevation: 0,
+            actions: <Widget>[
+              Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => AddFeedPage()));
+                    },
+                    child: const Icon(
+                      Icons.add,
+                      size: 26.0,
+                      color: Colors.black54,
+                    ),
+                  )),
+            ],
           ),
           body: RefreshIndicator(
             displacement: 0.0,
