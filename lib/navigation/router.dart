@@ -1,17 +1,17 @@
 import 'package:feeds/ui/splash/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:feeds/app_state_manager.dart';
 
 import 'routes.dart';
 
 final goRouter = GoRouter(
-    initialLocation: Routes.splash.path,
+    initialLocation: Routes.home.path,
     routes: [
       Routes.splash,
       Routes.home,
     ],
-    refreshListenable: appStateManager,
+//    refreshListenable: appStateManager,
+/*
     redirect: (GoRouterState state) {
       if (!appStateManager.isInitialized) {
         // If not initialized and not on the splash page,
@@ -30,7 +30,9 @@ final goRouter = GoRouter(
 
       // No redirect.
       return null;
+      
     },
+    */
     errorPageBuilder: (BuildContext context, GoRouterState state) {
       // ignore: avoid_print
       print('Error state: ${state.error}');

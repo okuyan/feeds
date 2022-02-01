@@ -55,25 +55,27 @@ class AddFeedPage extends HookConsumerWidget {
                         final _value = _textController.value;
                         // TODO validate url
                         //print(value.toString());
-
-                        // Check if value is url
-                        // if so,
-                        if (Uri.tryParse(value.toString())!.hasAbsolutePath) {
-                          print('this is a valid uri');
-                          print(value.toString());
-                          // TODO DL content
-                          // if content is html, search rss feed in the content, if found, DL feed
-                          //
-                          // if rss feed exists, then show a feed title in ListView
-                        } else {
-                          print('this is not a valid uri');
-                          ref.read(searchResultFeedProvider.notifier).state = [
-                            Feed(title: 'hoge', url: 'hoge', articleCount: 1),
-                            Feed(title: 'hoge', url: 'hoge', articleCount: 1),
-                          ];
-                          // TODO call Feedly search API
-                          // if there's result, show a feed title in ListView
-                          // else "No result" message
+                        if (_formKey.currentState!.validate()) {
+                          // Check if value is url
+                          // if so,
+                          if (Uri.tryParse(value.toString())!.hasAbsolutePath) {
+                            print('this is a valid uri');
+                            print(value.toString());
+                            // TODO DL content
+                            // if content is html, search rss feed in the content, if found, DL feed
+                            //
+                            // if rss feed exists, then show a feed title in ListView
+                          } else {
+                            print('this is not a valid uri');
+                            ref.read(searchResultFeedProvider.notifier).state =
+                                [
+                              Feed(title: 'hoge', url: 'hoge', articleCount: 1),
+                              Feed(title: 'hoge', url: 'hoge', articleCount: 1),
+                            ];
+                            // TODO call Feedly search API
+                            // if there's result, show a feed title in ListView
+                            // else "No result" message
+                          }
                         }
                       },
                     ),

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
 
@@ -6,8 +7,12 @@ import 'package:feeds/data/repository.dart';
 import 'package:feeds/network/service_interface.dart';
 import 'package:feeds/providers/app_providers.dart';
 
-Future<void> syncAllFeeds(
-    Repository repository, ServiceInterface service) async {
+import 'package:get_it/get_it.dart';
+
+Future<void> syncAllFeeds(ServiceInterface service, WidgetRef ref) async {
+  final getIt = GetIt.instance;
+  final repository = getIt.get<Repository>();
+
   final List<Feed> _feeds = repository.getAllFeeds();
   List<Article> _articles = [];
   int _unread = 0;
@@ -75,5 +80,5 @@ Future<void> syncAllFeeds(
   // Sort articles by pubDate
   _articles.sort((b, a) => a.pubDate.compareTo(b.pubDate));
 
-  initProviders(_feeds, _articles, _unread);
+  updateProviders(ref, _feeds, _articles, _unread);
 }

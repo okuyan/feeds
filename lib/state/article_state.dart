@@ -18,4 +18,8 @@ class ArticleList extends StateNotifier<List<Article>> {
 
     state = state.where((article) => article.link != target.link).toList();
   }
+
+  void replaceArticles(List<Article> articles) {
+    state.replaceRange(0, state.length, articles);
+  }
 }

@@ -20,4 +20,8 @@ class FeedList extends StateNotifier<List<Feed>> {
 
     state = state.where((feed) => feed.url != target.url).toList();
   }
+
+  void replaceFeeds(List<Feed> feeds) {
+    state.replaceRange(0, state.length, feeds);
+  }
 }
