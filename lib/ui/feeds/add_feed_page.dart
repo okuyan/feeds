@@ -1,8 +1,8 @@
 import 'package:feeds/data/models/feed.dart';
-import 'package:feeds/providers/app_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:feeds/ui/feeds/add_feed_view_model.dart';
 
 class AddFeedPage extends HookConsumerWidget {
   const AddFeedPage({Key? key}) : super(key: key);
@@ -69,8 +69,16 @@ class AddFeedPage extends HookConsumerWidget {
                             print('this is not a valid uri');
                             ref.read(searchResultFeedProvider.notifier).state =
                                 [
-                              Feed(title: 'hoge', url: 'hoge', articleCount: 1),
-                              Feed(title: 'hoge', url: 'hoge', articleCount: 1),
+                              Feed(
+                                  title: 'hoge',
+                                  url: 'hoge',
+                                  articleCount: 1,
+                                  lastBuildDate: DateTime.now()),
+                              Feed(
+                                  title: 'hoge',
+                                  url: 'hoge',
+                                  articleCount: 1,
+                                  lastBuildDate: DateTime.now()),
                             ];
                             // TODO call Feedly search API
                             // if there's result, show a feed title in ListView

@@ -20,19 +20,22 @@ class FeedAdapter extends TypeAdapter<Feed> {
       title: fields[0] as String,
       url: fields[1] as String,
       articleCount: fields[2] as int,
+      lastBuildDate: fields[3] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, Feed obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
       ..write(obj.url)
       ..writeByte(2)
-      ..write(obj.articleCount);
+      ..write(obj.articleCount)
+      ..writeByte(3)
+      ..write(obj.lastBuildDate);
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'package:feeds/network/feed_service.dart';
 import 'package:feeds/providers/app_providers.dart';
 import 'package:flutter/material.dart';
 
@@ -6,8 +5,6 @@ import 'package:feeds/ui/feeds/feeds_page.dart';
 import 'package:feeds/ui/unread/unread_page.dart';
 import 'package:feeds/ui/starred/starred_page.dart';
 import 'package:feeds/ui/feeds/add_feed_page.dart';
-
-import 'package:feeds/data/sync/syncFeeds.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -37,8 +34,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    syncAllFeeds(FeedService(), ref);
   }
 
   void goToTab(index) {
@@ -48,7 +43,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(selectedTabProvider);
-    final isoDwnloaded = ref.watch(dataLoadedProvideder);
     late String title;
 
     switch (selectedTab) {
@@ -87,22 +81,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                 )),
           ],
         ),
-        body: isoDwnloaded
-            ? RefreshIndicator(
-                displacement: 0.0,
-                color: Colors.black54,
-                backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
-                child: SafeArea(
-                  child: IndexedStack(
-                    index: selectedTab,
-                    children: pages,
-                  ),
-                ),
-                onRefresh: () {
-                  return Future.delayed(const Duration(seconds: 1));
-                },
-              )
-            : const Center(child: CircularProgressIndicator.adaptive()),
+        body: RefreshIndicator(
+          displacement: 0.0,
+          color: Colors.black54,
+          backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
+          child: SafeArea(
+            child: IndexedStack(
+              index: selectedTab,
+              children: pages,
+            ),
+          ),
+          onRefresh: () {
+            return Future.delayed(const Duration(seconds: 1));
+          },
+        ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: selectedTab,
           onTap: goToTab,
