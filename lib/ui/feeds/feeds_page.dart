@@ -26,8 +26,10 @@ class FeedsPage extends HookConsumerWidget {
                 return ListTile(
                   title: Text(feeds[index].title),
                   onTap: () {
+                    final selectedFeed = feeds[index];
                     ref.read(selectedFeedProvider.notifier).state =
-                        feeds[index];
+                        selectedFeed;
+
                     ref.read(articleListProvider.notifier).getArticles();
 
                     Navigator.of(_listContext).push(
