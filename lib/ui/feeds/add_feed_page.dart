@@ -1,16 +1,47 @@
+import 'dart:async';
+
 import 'package:feeds/data/models/feed.dart';
+import 'package:feeds/data/remote/service/feedly_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/ui/feeds/add_feed_view_model.dart';
+import 'package:feeds/data/remote/result.dart';
+
+String _useDebouncedSearch(TextEditingController textEditingController) {
+  final search = useState(textEditingController.text);
+  useEffect(() {
+    Timer? timer;
+    void listener() {
+      timer?.cancel();
+      timer = Timer(const Duration(microseconds: 200),
+          () => search.value = textEditingController.text);
+    }
+
+    textEditingController.addListener(listener);
+    return () {
+      timer?.cancel();
+      textEditingController.removeListener(listener);
+    };
+  }, [textEditingController]);
+  return search.value;
+}
 
 class AddFeedPage extends HookConsumerWidget {
-  const AddFeedPage({Key? key}) : super(key: key);
+  AddFeedPage({Key? key}) : super(key: key);
+//  final List<Feed> searchResult = [];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _formKey = GlobalKey<FormState>();
     final _textController = useTextEditingController();
+    useEffect(() {
+      return _textController.dispose;
+    }, [_textController]);
+    final searchText = useState('');
+    final showSearchResult = useState(false);
+
+    //final search = _useDebouncedSearch(_textController);
 
     return Scaffold(
         appBar: AppBar(
@@ -35,9 +66,13 @@ class AddFeedPage extends HookConsumerWidget {
                               icon: Icon(Icons.clear),
                               onPressed: () {
                                 _textController.clear();
+                                showSearchResult.value = false;
+
+                                /*
                                 ref
                                     .read(searchResultFeedProvider.notifier)
                                     .state = [];
+                                */
                               })),
                       keyboardType: TextInputType.url,
                       validator: (value) {
@@ -67,6 +102,10 @@ class AddFeedPage extends HookConsumerWidget {
                             // if rss feed exists, then show a feed title in ListView
                           } else {
                             print('this is not a valid uri');
+                            searchText.value = _textController.text;
+                            showSearchResult.value = true;
+
+                            /*
                             ref.read(searchResultFeedProvider.notifier).state =
                                 [
                               Feed(
@@ -80,6 +119,7 @@ class AddFeedPage extends HookConsumerWidget {
                                   articleCount: 1,
                                   lastBuildDate: DateTime.now()),
                             ];
+                            */
                             // TODO call Feedly search API
                             // if there's result, show a feed title in ListView
                             // else "No result" message
@@ -90,20 +130,37 @@ class AddFeedPage extends HookConsumerWidget {
                   ],
                 )),
           ),
-          _buildFeedList(ref)
+          _buildFeedList(ref, searchText.value.trim(), showSearchResult)
         ]));
   }
 
-  Widget _buildFeedList(WidgetRef ref) {
-    final List feeds = ref.watch(searchResultFeedProvider);
+  void startSearch(WidgetRef ref, String searchText) {
+    // fooderrich だと、ここでいろいろsetState()してる
+  }
 
-    return Expanded(
-        child: Visibility(
-            visible: feeds.isNotEmpty,
-            child: ListView.builder(
-                itemCount: feeds.length, // test
-                itemBuilder: (context, index) {
-                  return Text(feeds[index].title.toString());
-                })));
+  Widget _buildFeedList(WidgetRef ref, search, showSearchResult) {
+    final feeds = ref.watch(searchResultFeedProvider(search));
+    final List<FeedlyResult> resultList = [];
+
+    return Visibility(
+        visible: showSearchResult.value,
+        child: feeds.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Text('error!!!!'),
+            data: (feeds) {
+              print('done........');
+              if (feeds == null) {
+                return const SizedBox.shrink();
+              }
+
+              final results = (feeds?.body as Success).value;
+              resultList.addAll(results.results);
+              return Expanded(
+                  child: ListView.builder(
+                      itemCount: resultList.length, // test
+                      itemBuilder: (context, index) {
+                        return Text(resultList[index].title.toString());
+                      }));
+            }));
   }
 }

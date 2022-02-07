@@ -1,6 +1,10 @@
 import 'models/models.dart';
 import 'package:webfeed/webfeed.dart';
 
+import 'package:feeds/data/remote/result.dart';
+import 'package:feeds/data/remote/service/feedly_model.dart';
+import 'package:chopper/chopper.dart';
+
 abstract class RepositoryInterface {
   List<Feed> getFeeds();
   Feed getFeed(int id);
@@ -14,5 +18,8 @@ abstract class RepositoryInterface {
   void addArticle(Article article);
 
   Future initLocalDataSource();
+
+  Future<Response<Result<FeedlyResults>>> searchFeeds(String query);
+
   void close();
 }

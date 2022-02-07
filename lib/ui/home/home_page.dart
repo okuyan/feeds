@@ -70,8 +70,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 padding: const EdgeInsets.only(right: 20.0),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const AddFeedPage()));
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => AddFeedPage()));
                   },
                   child: const Icon(
                     Icons.add,

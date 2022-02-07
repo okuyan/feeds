@@ -2,10 +2,14 @@ import 'package:feeds/data/remote/remote_data_source.dart';
 import 'package:feeds/data/repository_interface.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-//import 'package:feeds/data/local/hive_local_data_source.dart';
 import 'package:hive/hive.dart';
+import 'package:feeds/data/remote/service/feedly_service.dart';
+import 'package:feeds/data/remote/service/feedly_model.dart';
 
 import 'models/models.dart';
+
+import 'package:feeds/data/remote/result.dart';
+import 'package:chopper/chopper.dart';
 
 final repositoryProvider = Provider((ref) => Repository(ref.read));
 
@@ -106,6 +110,14 @@ class Repository implements RepositoryInterface {
     // check lastBuildDate, if no update, skip
     // if updated, then update feed data
     // save articles data to local
+  }
+
+  @override
+  Future<Response<Result<FeedlyResults>>> searchFeeds(String query) async {
+    print('kdjgkldsjgklsdjgdlfkgjfdl');
+    // call feedly service
+    final feedlyService = FeedlyService.create();
+    return await feedlyService.searchFeeds(query: query);
   }
 
   // close local db
