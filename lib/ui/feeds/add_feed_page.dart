@@ -1,47 +1,32 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:feeds/data/models/feed.dart';
 import 'package:feeds/data/remote/service/feedly_model.dart';
+import 'package:feeds/data/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/ui/feeds/add_feed_view_model.dart';
 import 'package:feeds/data/remote/result.dart';
+import 'package:feeds/ui/feeds/feed_view_model.dart';
+import 'package:webfeed/webfeed.dart';
 
-String _useDebouncedSearch(TextEditingController textEditingController) {
-  final search = useState(textEditingController.text);
-  useEffect(() {
-    Timer? timer;
-    void listener() {
-      timer?.cancel();
-      timer = Timer(const Duration(microseconds: 200),
-          () => search.value = textEditingController.text);
-    }
-
-    textEditingController.addListener(listener);
-    return () {
-      timer?.cancel();
-      textEditingController.removeListener(listener);
-    };
-  }, [textEditingController]);
-  return search.value;
-}
+import 'package:feeds/utils/DateTimeUtils.dart' as DateTimeUtils;
 
 class AddFeedPage extends HookConsumerWidget {
-  AddFeedPage({Key? key}) : super(key: key);
-//  final List<Feed> searchResult = [];
+  const AddFeedPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _formKey = GlobalKey<FormState>();
     final _textController = useTextEditingController();
     useEffect(() {
-      return _textController.dispose;
+//      return _textController.dispose;
     }, [_textController]);
     final searchText = useState('');
     final showSearchResult = useState(false);
-
-    //final search = _useDebouncedSearch(_textController);
+    final showIndicator = useState(false);
 
     return Scaffold(
         appBar: AppBar(
@@ -50,95 +35,56 @@ class AddFeedPage extends HookConsumerWidget {
           backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
           elevation: 0,
         ),
-        body: Column(children: [
-          Form(
-            key: _formKey,
-            child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      //autovalidateMode: AutovalidateMode.onUserInteraction,
-                      controller: _textController,
-                      decoration: InputDecoration(
-                          hintText: 'Type a topic or paste a feed URL',
-                          suffix: IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _textController.clear();
-                                showSearchResult.value = false;
+        body: showIndicator.value
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(children: [
+                Form(
+                  key: _formKey,
+                  child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            //autovalidateMode: AutovalidateMode.onUserInteraction,
+                            controller: _textController,
+                            decoration: InputDecoration(
+                                hintText: 'Type a topic or paste a feed URL',
+                                suffix: IconButton(
+                                    icon: Icon(Icons.clear),
+                                    onPressed: () {
+                                      _textController.clear();
+                                      showSearchResult.value = false;
+                                    })),
+                            keyboardType: TextInputType.url,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please type a keyword or paste the feed URL.';
+                              }
+                              return null;
+                            },
 
-                                /*
-                                ref
-                                    .read(searchResultFeedProvider.notifier)
-                                    .state = [];
-                                */
-                              })),
-                      keyboardType: TextInputType.url,
-                      validator: (value) {
-                        print('validating');
-                        print(value.toString());
-                        if (value == null || value.isEmpty) {
-                          return 'Please type a keyword or paste the feed URL.';
-                        }
-                        return null;
-                      },
-
-                      onFieldSubmitted: (value) {
-                        print('OnFieldSubmitted............');
-
-                        final _value = _textController.value;
-                        // TODO validate url
-                        //print(value.toString());
-                        if (_formKey.currentState!.validate()) {
-                          // Check if value is url
-                          // if so,
-                          if (Uri.tryParse(value.toString())!.hasAbsolutePath) {
-                            print('this is a valid uri');
-                            print(value.toString());
-                            // TODO DL content
-                            // if content is html, search rss feed in the content, if found, DL feed
-                            //
-                            // if rss feed exists, then show a feed title in ListView
-                          } else {
-                            print('this is not a valid uri');
-                            searchText.value = _textController.text;
-                            showSearchResult.value = true;
-
-                            /*
-                            ref.read(searchResultFeedProvider.notifier).state =
-                                [
-                              Feed(
-                                  title: 'hoge',
-                                  url: 'hoge',
-                                  articleCount: 1,
-                                  lastBuildDate: DateTime.now()),
-                              Feed(
-                                  title: 'hoge',
-                                  url: 'hoge',
-                                  articleCount: 1,
-                                  lastBuildDate: DateTime.now()),
-                            ];
-                            */
-                            // TODO call Feedly search API
-                            // if there's result, show a feed title in ListView
-                            // else "No result" message
-                          }
-                        }
-                      },
-                    ),
-                  ],
-                )),
-          ),
-          _buildFeedList(ref, searchText.value.trim(), showSearchResult)
-        ]));
+                            onFieldSubmitted: (value) {
+                              print('OnFieldSubmitted............');
+                              searchText.value = _textController.text;
+                              showSearchResult.value = true;
+                            },
+                          ),
+                        ],
+                      )),
+                ),
+                _buildFeedList(ref, searchText.value.trim(), showSearchResult,
+                    showIndicator)
+              ]));
   }
 
   void startSearch(WidgetRef ref, String searchText) {
     // fooderrich だと、ここでいろいろsetState()してる
   }
 
-  Widget _buildFeedList(WidgetRef ref, search, showSearchResult) {
+  Widget _buildFeedList(
+      WidgetRef ref, search, showSearchResult, showIndicator) {
     final feeds = ref.watch(searchResultFeedProvider(search));
     final List<FeedlyResult> resultList = [];
 
@@ -146,6 +92,7 @@ class AddFeedPage extends HookConsumerWidget {
         visible: showSearchResult.value,
         child: feeds.when(
             loading: () => const Center(child: CircularProgressIndicator()),
+            // TODO show error message
             error: (err, stack) => Text('error!!!!'),
             data: (feeds) {
               print('done........');
@@ -153,14 +100,52 @@ class AddFeedPage extends HookConsumerWidget {
                 return const SizedBox.shrink();
               }
 
-              final results = (feeds?.body as Success).value;
+              final results = (feeds.body as Success).value;
               resultList.addAll(results.results);
               return Expanded(
+                child: _buildSearchResultList(ref, resultList, showIndicator),
+                /*
                   child: ListView.builder(
                       itemCount: resultList.length, // test
                       itemBuilder: (context, index) {
                         return Text(resultList[index].title.toString());
-                      }));
+                      })*/
+              );
             }));
+  }
+
+  Widget _buildSearchResultList(ref, resultList, showIndicator) {
+    return ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        itemCount: resultList.length,
+        itemBuilder: (context, index) {
+          return _buildItemTile(ref, resultList[index], showIndicator);
+        });
+  }
+
+  void addFeed(ref, item, showIndicator) async {
+    // TODO show indicator
+    showIndicator.value = true;
+    // download feed
+    final RssFeed rssFeed =
+        await ref.read(repositoryProvider).downloadFeed(Uri.parse(item.feedId));
+
+    final lastBuildDate = DateTimeUtils.DateUtils()
+        .parseRfc822Date(rssFeed.lastBuildDate.toString());
+
+    ref.read(feedViewModelProvider.notifier).add(
+        rssFeed.title, item.feedId, rssFeed.items?.length ?? 0, lastBuildDate);
+    showIndicator.value = false;
+  }
+
+  Widget _buildItemTile(ref, item, showIndicator) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        title: Text(item.title),
+        trailing: Icon(Icons.add),
+        onTap: () => addFeed(ref, item, showIndicator),
+      ),
+    );
   }
 }

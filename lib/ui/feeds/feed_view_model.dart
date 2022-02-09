@@ -16,7 +16,13 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
   final Repository repository;
 
   void add(String title, String url, int articleCount, DateTime lastBuildDate) {
-    // TODO adding new data to repository
+    // TODO adding new data to repository?
+
+    repository.addFeed(Feed(
+        title: title,
+        url: url,
+        articleCount: articleCount,
+        lastBuildDate: lastBuildDate));
 
     state = [
       ...state,
@@ -68,7 +74,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
           _articles.add(article);
         }
         final newFeed = sampleFeed.updateArticleCount(_items.length);
-        repository.addFeed(newFeed);
+//        repository.addFeed(newFeed);
 
         add(newFeed.title, newFeed.url, newFeed.articleCount,
             newFeed.lastBuildDate);

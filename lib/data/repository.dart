@@ -74,7 +74,6 @@ class Repository implements RepositoryInterface {
     List<Article> _articles = [];
     List<int> _articleIds = Hive.box('articleBox').keys.cast<int>().toList();
     for (final id in _articleIds) {
-      Article article = getArticle(id);
       _articles.add((getArticle(id)));
     }
     return _articles;
