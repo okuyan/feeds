@@ -21,9 +21,6 @@ class AddFeedPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final _formKey = GlobalKey<FormState>();
     final _textController = useTextEditingController();
-    useEffect(() {
-//      return _textController.dispose;
-    }, [_textController]);
     final searchText = useState('');
     final showSearchResult = useState(false);
     final showIndicator = useState(false);
@@ -135,6 +132,7 @@ class AddFeedPage extends HookConsumerWidget {
 
     ref.read(feedViewModelProvider.notifier).add(
         rssFeed.title, item.feedId, rssFeed.items?.length ?? 0, lastBuildDate);
+    item.isFollowed = true;
     showIndicator.value = false;
   }
 
@@ -143,8 +141,12 @@ class AddFeedPage extends HookConsumerWidget {
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
         title: Text(item.title),
-        trailing: Icon(Icons.add),
-        onTap: () => addFeed(ref, item, showIndicator),
+        trailing: item.isFollowed ? Icon(Icons.done) : Icon(Icons.add),
+        onTap: () {
+          if (item.isFollowed == false) {
+            addFeed(ref, item, showIndicator);
+          }
+        },
       ),
     );
   }

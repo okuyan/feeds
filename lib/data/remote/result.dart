@@ -1,7 +1,7 @@
 abstract class Result<T> {}
 
 class Success<T> extends Result<T> {
-  final T value;
+  T value;
 
   Success(this.value);
 }

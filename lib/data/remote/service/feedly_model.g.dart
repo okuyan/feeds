@@ -23,6 +23,7 @@ FeedlyResult _$FeedlyResultFromJson(Map<String, dynamic> json) => FeedlyResult(
       website: json['website'] as String,
       feedId: _parseFeedId(json['feedId'] as String),
       iconUrl: json['iconUrl'] as String?,
+      isFollowed: json['isFollowed'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$FeedlyResultToJson(FeedlyResult instance) =>
@@ -31,4 +32,5 @@ Map<String, dynamic> _$FeedlyResultToJson(FeedlyResult instance) =>
       'website': instance.website,
       'feedId': instance.feedId,
       'iconUrl': instance.iconUrl,
+      'isFollowed': instance.isFollowed,
     };

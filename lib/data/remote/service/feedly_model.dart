@@ -24,12 +24,14 @@ class FeedlyResult {
   @JsonKey(fromJson: _parseFeedId)
   String feedId;
   String? iconUrl;
+  bool isFollowed;
 
   FeedlyResult({
     required this.title,
     required this.website,
     required this.feedId,
     this.iconUrl,
+    this.isFollowed = false,
   });
 
   factory FeedlyResult.fromJson(Map<String, dynamic> json) =>

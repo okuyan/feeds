@@ -10,6 +10,8 @@ import 'models/models.dart';
 
 import 'package:feeds/data/remote/result.dart';
 import 'package:chopper/chopper.dart';
+import 'package:feeds/data/remote/result.dart';
+import 'package:collection/collection.dart';
 
 final repositoryProvider = Provider((ref) => Repository(ref.read));
 
@@ -113,10 +115,26 @@ class Repository implements RepositoryInterface {
 
   @override
   Future<Response<Result<FeedlyResults>>> searchFeeds(String query) async {
-    print('kdjgkldsjgklsdjgdlfkgjfdl');
     // call feedly service
     final feedlyService = FeedlyService.create();
-    return await feedlyService.searchFeeds(query: query);
+    final response = await feedlyService.searchFeeds(query: query);
+    final searchResult = (response.body as Success).value;
+    final results = searchResult.results;
+    // TODO get current feeds in hive
+    // Check if feed is already being followed
+    var currentFeeds = getFeeds();
+    for (var i = 0; i < results.length; i++) {
+      final existing = currentFeeds
+          .firstWhereOrNull((element) => element.url == results[i].feedId);
+      if (existing == null) {
+        continue;
+      }
+      currentFeeds.remove(existing);
+      results[i].isFollowed = true;
+    }
+
+    (response.body as Success).value = FeedlyResults(results: results);
+    return response;
   }
 
   // close local db
