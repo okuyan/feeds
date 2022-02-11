@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:feeds/data/models/models.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/ui/feeds/article_page.dart';
 import 'package:feeds/providers/app_providers.dart';
+import 'package:feeds/ui/feeds/article_list_view_model.dart';
 
 class ArticleListPage extends ConsumerWidget {
   const ArticleListPage({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class ArticleListPage extends ConsumerWidget {
     List<Article> _articles = ref.watch(articleListProvider);
     Feed? _selectedFeed = ref.watch(selectedFeedProvider);
     final _title = _selectedFeed!.title;
+
     return Scaffold(
         appBar: AppBar(
           iconTheme: const IconThemeData(color: Colors.black),

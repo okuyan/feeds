@@ -1,16 +1,21 @@
-import 'package:feeds/data/repository.dart';
+import 'package:feeds/data/local/local_data_source.dart';
 import 'package:hive/hive.dart';
 import 'package:feeds/data/models/models.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class HiveRepository extends Repository {
-  late Box _feedBox;
-  late Box _articleBox;
+late final FutureProvider hiveInfo;
+late final FutureProvider hiveLocalDataSourceProvider;
+
+class HiveLocalDataSource implements LocalDataSource {
+//  late Box _feedBox;
+//  late Box _articleBox;
+  HiveLocalDataSource(Box feedBox, Box articleBox);
 
   @override
   List<Feed> getAllFeeds() {
     List<Feed> _feeds = [];
 
-    List<int> _feedIds = _feedBox.keys.cast<int>().toList();
+    List<int> _feedIds = Hive.box('feedBox').keys.cast<int>().toList();
     if (_feedIds.isEmpty) {
       return _feeds;
     }
@@ -23,13 +28,13 @@ class HiveRepository extends Repository {
 
   @override
   Feed getFeed(int id) {
-    return _feedBox.getAt(id);
+    return Hive.box('feedBox').getAt(id);
   }
 
   @override
   List<Article> getAllArticles() {
     List<Article> _articles = [];
-    List<int> _articleIds = _articleBox.keys.cast<int>().toList();
+    List<int> _articleIds = Hive.box('articleBox').keys.cast<int>().toList();
     for (final id in _articleIds) {
       Article article = getArticle(id);
       _articles.add((getArticle(id)));
@@ -39,23 +44,23 @@ class HiveRepository extends Repository {
 
   @override
   Article getArticle(int id) {
-    return _articleBox.getAt(id);
+    return Hive.box('articleBox').getAt(id);
   }
 
   @override
   Future<void> init() async {
-    _feedBox = await Hive.openBox('feedBox');
-    _articleBox = await Hive.openBox('articleBox');
+//    _feedBox = await Hive.openBox('feedBox');
+//    _articleBox = await Hive.openBox('articleBox');
   }
 
   @override
   void addArticle(Article article) {
-    _articleBox.add(article);
+    Hive.box('articleBox').add(article);
   }
 
   @override
   void addFeed(Feed feed) {
-    _feedBox.add(feed);
+    Hive.box('feedBox').add(feed);
   }
 
   @override
