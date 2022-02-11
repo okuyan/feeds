@@ -13,8 +13,8 @@ class ArticleList extends StateNotifier<List<Article>> {
 
   final Repository repository;
 
-  void getArticles() {
-    final articles = repository.getArticles();
+  void getArticles(Feed feed) {
+    final articles = repository.getArticlesByFeed(feed);
     state = [...articles];
   }
 

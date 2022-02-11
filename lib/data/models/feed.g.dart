@@ -20,7 +20,7 @@ class FeedAdapter extends TypeAdapter<Feed> {
       title: fields[0] as String,
       url: fields[1] as String,
       articleCount: fields[2] as int,
-      lastBuildDate: fields[3] as DateTime,
+      siteUrl: fields[3] as String,
     );
   }
 
@@ -35,7 +35,7 @@ class FeedAdapter extends TypeAdapter<Feed> {
       ..writeByte(2)
       ..write(obj.articleCount)
       ..writeByte(3)
-      ..write(obj.lastBuildDate);
+      ..write(obj.siteUrl);
   }
 
   @override

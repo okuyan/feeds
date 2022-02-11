@@ -25,7 +25,8 @@ class ArticlePage extends ConsumerWidget {
         backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
         elevation: 0,
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(7),
         children: [
           InkWell(
             child: Padding(
@@ -36,17 +37,20 @@ class ArticlePage extends ConsumerWidget {
                 )),
             onTap: () => launchArticle(selectedArticle.link),
           ),
-          Text(
-            selectedArticle.pubDate.toString(),
-            style: const TextStyle(fontSize: 11),
-          ),
           Padding(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                selectedArticle.pubDate.toString(),
+                style: const TextStyle(fontSize: 11),
+              )),
+          Expanded(
+              child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Text(
               selectedArticle.content.toString(),
               style: FeedsTheme.lightTextTheme.bodyText2,
             ),
-          )
+          ))
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:feeds/data/models/article.dart';
 import 'package:feeds/data/models/feed.dart';
 import 'package:feeds/data/remote/service/feedly_model.dart';
 import 'package:feeds/data/repository.dart';
@@ -127,12 +128,26 @@ class AddFeedPage extends HookConsumerWidget {
     final RssFeed rssFeed =
         await ref.read(repositoryProvider).downloadFeed(Uri.parse(item.feedId));
 
-    final lastBuildDate = DateTimeUtils.DateUtils()
-        .parseRfc822Date(rssFeed.lastBuildDate.toString());
-
     ref.read(feedViewModelProvider.notifier).add(
-        rssFeed.title, item.feedId, rssFeed.items?.length ?? 0, lastBuildDate);
+        rssFeed.title, item.feedId, rssFeed.items?.length ?? 0, rssFeed.link);
     item.isFollowed = true;
+
+    // add articles to repository
+    rssFeed.items?.forEach((element) {
+      String content = element.description ?? element.content!.value;
+      // TODO parse pub date
+
+      // pub date is now() fpr temporary
+      Article article = Article(
+          siteUrl: rssFeed.link.toString(),
+          title: element.title.toString(),
+          link: element.link.toString(),
+          unread: true,
+          content: content,
+          pubDate: DateTime.now());
+      ref.read(repositoryProvider).addArticle(article);
+    });
+
     showIndicator.value = false;
   }
 

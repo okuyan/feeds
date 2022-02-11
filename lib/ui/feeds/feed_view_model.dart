@@ -15,22 +15,21 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   final Repository repository;
 
-  void add(String title, String url, int articleCount, DateTime lastBuildDate) {
+  void add(
+    String title,
+    String url,
+    int articleCount,
+    String siteUrl,
+  ) {
     // TODO adding new data to repository?
 
     repository.addFeed(Feed(
-        title: title,
-        url: url,
-        articleCount: articleCount,
-        lastBuildDate: lastBuildDate));
+        title: title, url: url, articleCount: articleCount, siteUrl: siteUrl));
 
     state = [
       ...state,
       Feed(
-          title: title,
-          url: url,
-          articleCount: articleCount,
-          lastBuildDate: lastBuildDate),
+          title: title, url: url, articleCount: articleCount, siteUrl: siteUrl),
     ];
   }
 
@@ -56,7 +55,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
           title: 'just sal\'s blog on nonbei alley',
           url: 'https://blog.salrashid.dev/index.xml',
           articleCount: 0,
-          lastBuildDate: now);
+          siteUrl: 'https://blog.salrashid.dev/');
       final sample = await repository.downloadFeed(Uri.parse(sampleFeed.url));
       if (sample.items!.isNotEmpty) {
         final List<RssItem> _items = sample.items!;
@@ -64,7 +63,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
           var content = rssItem.description ?? rssItem.content;
           // Add articles
           Article article = Article(
-              siteUrl: sampleFeed.url,
+              siteUrl: sampleFeed.siteUrl,
               title: rssItem.title.toString(),
               link: rssItem.link.toString(),
               unread: true,
@@ -76,8 +75,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
         final newFeed = sampleFeed.updateArticleCount(_items.length);
 //        repository.addFeed(newFeed);
 
-        add(newFeed.title, newFeed.url, newFeed.articleCount,
-            newFeed.lastBuildDate);
+        add(newFeed.title, newFeed.url, newFeed.articleCount, newFeed.siteUrl);
         _feeds.add(newFeed);
         _unread += _items.length;
       }
@@ -92,9 +90,9 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
         }
 
         for (RssItem rssItem in feedData.items!) {
-          var content = rssItem.description ?? rssItem.content;
+          var content = rssItem.description ?? rssItem.content!.value;
           Article article = Article(
-              siteUrl: feed.url,
+              siteUrl: feed.siteUrl,
               title: rssItem.title.toString(),
               link: rssItem.link.toString(),
               unread: true,

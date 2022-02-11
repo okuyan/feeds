@@ -9,6 +9,6 @@ Future<void> bootstrap() async {
   Hive.registerAdapter(FeedAdapter());
   Hive.registerAdapter(ArticleAdapter());
 
-  final _feedBox = await Hive.openBox('feedBox');
-  final _articleBox = await Hive.openBox('articleBox');
+  final _feedBox = await Hive.openBox<Feed>('feedBox');
+  final _articleBox = await Hive.openBox<Article>('articleBox');
 }

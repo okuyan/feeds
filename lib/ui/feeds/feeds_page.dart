@@ -30,7 +30,9 @@ class FeedsPage extends HookConsumerWidget {
                     ref.read(selectedFeedProvider.notifier).state =
                         selectedFeed;
 
-                    ref.read(articleListProvider.notifier).getArticles();
+                    ref
+                        .read(articleListProvider.notifier)
+                        .getArticles(feeds[index]);
 
                     Navigator.of(_listContext).push(
                       MaterialPageRoute(

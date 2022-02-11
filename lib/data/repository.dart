@@ -32,31 +32,15 @@ class Repository implements RepositoryInterface {
   @override
   List<Feed> getFeeds() {
 //    return _localDataSource.getAllFeeds();
-    List<Feed> _feeds = [];
 
-    List<int> _feedIds = Hive.box('feedBox').keys.cast<int>().toList();
-    if (_feedIds.isEmpty) {
-      return _feeds;
-    }
-
-    for (final id in _feedIds) {
-      _feeds.add((getFeed(id)));
-    }
-    return _feeds;
-  }
-
-  // get feed from local db
-  @override
-  Feed getFeed(int id) {
-//    return _localDataSource.getFeed(id);
-    return Hive.box('feedBox').getAt(id);
+    return Hive.box<Feed>('feedBox').values.toList();
   }
 
   // add feed to local db
   @override
   void addFeed(Feed feed) {
 //    _localDataSource.addFeed(feed);
-    Hive.box('feedBox').add(feed);
+    Hive.box<Feed>('feedBox').add(feed);
   }
 
   // find feeds via API
@@ -73,26 +57,40 @@ class Repository implements RepositoryInterface {
   @override
   List<Article> getArticles() {
     //return _localDataSource.getAllArticles();
-    List<Article> _articles = [];
-    List<int> _articleIds = Hive.box('articleBox').keys.cast<int>().toList();
-    for (final id in _articleIds) {
-      _articles.add((getArticle(id)));
-    }
-    return _articles;
+    return Hive.box<Article>('articleBox').values.toList();
   }
 
-  // get article from local db
-  @override
-  Article getArticle(int id) {
-    //return _localDataSource.getArticle(id);
-    return Hive.box('articleBox').getAt(id);
+  List<Article> getArticlesByFeed(Feed feed) {
+    return Hive.box<Article>('articleBox')
+        .values
+        .where((element) => element.siteUrl == feed.siteUrl)
+        .toList();
+  }
+
+  List<Article> getArticlesByUrl(Feed feed, String url) {
+    return Hive.box<Article>('articleBox')
+        .values
+        .toList()
+        .where((article) =>
+            (article.link == url && article.siteUrl == feed.siteUrl))
+        .toList();
   }
 
   // add article to local db
   @override
   void addArticle(Article article) {
     //_localDataSource.addArticle(article);
-    Hive.box('articleBox').add(article);
+
+    // TODO check if exists
+    final currentArticles = Hive.box<Article>('articleBox')
+        .values
+        .where((element) => (element.link == article.link &&
+            element.siteUrl == article.siteUrl))
+        .toList();
+    if (currentArticles.isEmpty) {
+      // if not, lets add it
+      Hive.box<Article>('articleBox').add(article);
+    }
   }
 
   // init local db
@@ -107,10 +105,6 @@ class Repository implements RepositoryInterface {
     // add test feed
 
     // loop through to fetch the latest rss feed
-
-    // check lastBuildDate, if no update, skip
-    // if updated, then update feed data
-    // save articles data to local
   }
 
   @override

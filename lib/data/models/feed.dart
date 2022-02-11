@@ -14,38 +14,28 @@ class Feed extends Equatable {
   @HiveField(2)
   final int articleCount;
   @HiveField(3)
-  final DateTime lastBuildDate;
+  final String siteUrl;
 
   const Feed(
       {required this.title,
       required this.url,
       required this.articleCount,
-      required this.lastBuildDate});
+      required this.siteUrl});
 
   @override
-  List<Object?> get props => [title, url, articleCount];
+  List<Object?> get props => [title, url, articleCount, siteUrl];
 
   Feed updateTitle(String title) {
     return Feed(
-        title: title,
-        url: url,
-        articleCount: articleCount,
-        lastBuildDate: lastBuildDate);
+        title: title, url: url, articleCount: articleCount, siteUrl: siteUrl);
   }
 
   Feed updateUrl(String title) {
     return Feed(
-        title: title,
-        url: url,
-        articleCount: articleCount,
-        lastBuildDate: lastBuildDate);
+        title: title, url: url, articleCount: articleCount, siteUrl: siteUrl);
   }
 
   Feed updateArticleCount(int count) {
-    return Feed(
-        title: title,
-        url: url,
-        articleCount: count,
-        lastBuildDate: lastBuildDate);
+    return Feed(title: title, url: url, articleCount: count, siteUrl: siteUrl);
   }
 }
