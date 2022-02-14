@@ -1,8 +1,3 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:feeds/data/models/article.dart';
-import 'package:feeds/data/models/feed.dart';
 import 'package:feeds/data/remote/service/feedly_model.dart';
 import 'package:feeds/data/repository.dart';
 import 'package:flutter/material.dart';
@@ -102,12 +97,6 @@ class AddFeedPage extends HookConsumerWidget {
               resultList.addAll(results.results);
               return Expanded(
                 child: _buildSearchResultList(ref, resultList, showIndicator),
-                /*
-                  child: ListView.builder(
-                      itemCount: resultList.length, // test
-                      itemBuilder: (context, index) {
-                        return Text(resultList[index].title.toString());
-                      })*/
               );
             }));
   }
@@ -125,29 +114,20 @@ class AddFeedPage extends HookConsumerWidget {
     // TODO show indicator
     showIndicator.value = true;
     // download feed
-    final RssFeed rssFeed =
+    final feed =
         await ref.read(repositoryProvider).downloadFeed(Uri.parse(item.feedId));
 
-    ref.read(feedViewModelProvider.notifier).add(
-        rssFeed.title, item.feedId, rssFeed.items?.length ?? 0, rssFeed.link);
+    if (feed is RssFeed) {
+      ref
+          .read(feedViewModelProvider.notifier)
+          .saveRssFeed(feed, ref, item.feedId);
+    } else if (feed is AtomFeed) {
+      ref
+          .read(feedViewModelProvider.notifier)
+          .saveAtomFeed(feed, ref, item.feedId);
+    }
+
     item.isFollowed = true;
-
-    // add articles to repository
-    rssFeed.items?.forEach((element) {
-      String content = element.description ?? element.content!.value;
-      // TODO parse pub date
-
-      // pub date is now() fpr temporary
-      Article article = Article(
-          siteUrl: rssFeed.link.toString(),
-          title: element.title.toString(),
-          link: element.link.toString(),
-          unread: true,
-          content: content,
-          pubDate: DateTime.now());
-      ref.read(repositoryProvider).addArticle(article);
-    });
-
     showIndicator.value = false;
   }
 

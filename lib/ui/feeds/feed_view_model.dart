@@ -1,8 +1,8 @@
 import 'package:feeds/data/repository.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:feeds/data/models/models.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final feedViewModelProvider =
     StateNotifierProvider<FeedViewModel, List<Feed>>((ref) {
@@ -17,107 +17,186 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   void add(
     String title,
-    String url,
+    String feedId,
     int articleCount,
-    String siteUrl,
+    String website,
   ) {
-    // TODO adding new data to repository?
-
-    repository.addFeed(Feed(
-        title: title, url: url, articleCount: articleCount, siteUrl: siteUrl));
-
     state = [
       ...state,
       Feed(
-          title: title, url: url, articleCount: articleCount, siteUrl: siteUrl),
+          title: title,
+          feedId: feedId,
+          articleCount: articleCount,
+          website: website),
     ];
   }
 
   void remove(Feed target) {
     // TODO removing data from repository
 
-    state = state.where((feed) => feed.url != target.url).toList();
+    state = state.where((feed) => feed.feedId != target.feedId).toList();
   }
 
   void replaceFeeds(List<Feed> feeds) {
     state = [...feeds];
   }
 
-  Future<void> fetchFeeds() async {
+  Future<void> fetchFeeds(ref) async {
     final List<Feed> _feeds = repository.getFeeds();
     List<Article> _articles = [];
     int _unread = 0;
 
     if (_feeds.isEmpty) {
       // DL sample feed
-      final now = DateTime.now();
-      final sampleFeed = Feed(
+      const sampleFeed = Feed(
           title: 'just sal\'s blog on nonbei alley',
-          url: 'https://blog.salrashid.dev/index.xml',
+          feedId: 'https://blog.salrashid.dev/index.xml',
           articleCount: 0,
-          siteUrl: 'https://blog.salrashid.dev/');
-      final sample = await repository.downloadFeed(Uri.parse(sampleFeed.url));
-      if (sample.items!.isNotEmpty) {
-        final List<RssItem> _items = sample.items!;
-        for (RssItem rssItem in _items) {
-          var content = rssItem.description ?? rssItem.content;
-          // Add articles
-          Article article = Article(
-              siteUrl: sampleFeed.siteUrl,
-              title: rssItem.title.toString(),
-              link: rssItem.link.toString(),
-              unread: true,
-              pubDate: rssItem.pubDate ?? DateTime.now(),
-              content: content.toString());
-          repository.addArticle(article);
-          _articles.add(article);
-        }
-        final newFeed = sampleFeed.updateArticleCount(_items.length);
-//        repository.addFeed(newFeed);
+          website: 'https://blog.salrashid.dev/');
+      final sample =
+          await repository.downloadFeed(Uri.parse(sampleFeed.feedId));
 
-        add(newFeed.title, newFeed.url, newFeed.articleCount, newFeed.siteUrl);
-        _feeds.add(newFeed);
-        _unread += _items.length;
+      if (sample is RssFeed) {
+        saveRssFeed(sample, ref, sampleFeed.feedId);
+      } else if (sample is AtomFeed) {
+        saveAtomFeed(sample, ref, sampleFeed.feedId);
       }
+
+      final newFeed = sampleFeed.updateArticleCount(sample.items.length);
+
+      // update state
+      //add(newFeed.title, newFeed.feedId, newFeed.articleCount, newFeed.website);
+
+      _unread += newFeed.articleCount;
     } else {
       List<Article> oldArticles = repository.getArticles();
+      final List<Feed> updatedFeeds = [];
 
       for (final feed in _feeds) {
-        final RssFeed feedData =
-            await repository.downloadFeed(Uri.parse(feed.url));
+        final feedData = await repository.downloadFeed(Uri.parse(feed.feedId));
         if (feedData.items!.isEmpty) {
           continue;
         }
 
-        for (RssItem rssItem in feedData.items!) {
-          var content = rssItem.description ?? rssItem.content!.value;
-          Article article = Article(
-              siteUrl: feed.siteUrl,
-              title: rssItem.title.toString(),
-              link: rssItem.link.toString(),
-              unread: true,
-              content: content.toString(),
-              pubDate: rssItem.pubDate ?? DateTime.now());
-          _articles.add(article);
+        final newFeed = Feed(
+            title: feed.title,
+            feedId: feed.feedId,
+            articleCount: feedData.items.length,
+            website: feed.website);
+        updatedFeeds.add(newFeed);
 
-          // Check if article already exists
-          Article? isExist =
-              oldArticles.firstWhereOrNull((old) => old.link == rssItem.link);
+        if (feedData is RssFeed) {
+          for (var i = 0; i < feedData.items!.length; i++) {
+            // Check if article already exists
+            Article? isExist = oldArticles
+                .firstWhereOrNull((old) => old.link == feedData.items![i].link);
+            // Check if the existing article is unread, if so, count up unread++
+            if (isExist != null && isExist.unread) {
+              _unread++;
+              continue;
+            }
 
-          // Check if the existing article is unread, if so, count up unread++
-          if (isExist != null && isExist.unread) {
-            _unread++;
-            continue;
+            saveRssItem(feedData.items![i], ref, feed.feedId);
           }
-          repository.addArticle(article);
+        } else if (feedData is AtomFeed) {
+          for (var i = 0; i < feedData.items!.length; i++) {
+            // Check if article already exists
+            Article? isExist = oldArticles.firstWhereOrNull((old) =>
+                old.link.toString() == feedData.items![i].links![0].toString());
+            // Check if the existing article is unread, if so, count up unread++
+            if (isExist != null && isExist.unread) {
+              _unread++;
+              continue;
+            }
+            saveAtomItem(feedData.items![i], ref, feed.feedId);
+          }
         }
+        replaceFeeds(updatedFeeds);
       }
     }
+  }
 
-    replaceFeeds(_feeds);
+  void saveRssFeed(RssFeed rssFeed, WidgetRef ref, String feedUrl) {
+    ref.read(feedViewModelProvider.notifier).add(rssFeed.title.toString(),
+        feedUrl, rssFeed.items?.length ?? 0, rssFeed.link.toString());
+    final Feed newFeed = Feed(
+        title: rssFeed.title.toString(),
+        articleCount: rssFeed.items!.length,
+        feedId: feedUrl,
+        website: rssFeed.link.toString());
+    ref.read(repositoryProvider).addFeed(newFeed);
+    rssFeed.items?.forEach((element) {
+      saveRssItem(element, ref, feedUrl);
+    });
+  }
 
-    // TODO
-    // feed page では、記事を表示しないので、
-    // 記事リストページのViewModelでHiveからデータをゲットして、ステートにセットする
+  void saveRssItem(RssItem item, WidgetRef ref, String feedId) {
+    String content = item.description ?? item.content!.value;
+
+    String articleLink = item.link.toString();
+    Article article = Article(
+        feedId: feedId,
+        title: item.title.toString(),
+        link: articleLink,
+        unread: true,
+        content: content,
+        pubDate: DateTime.now());
+    ref.read(repositoryProvider).addArticle(article);
+  }
+
+  void saveAtomFeed(AtomFeed atomFeed, WidgetRef ref, String feedId) {
+    print(atomFeed);
+
+    ref.read(feedViewModelProvider.notifier).add(
+        atomFeed.title.toString(), feedId, atomFeed.items?.length ?? 0, feedId);
+    final Feed newFeed = Feed(
+        title: atomFeed.title.toString(),
+        articleCount: atomFeed.items!.length,
+        feedId: feedId,
+        website: atomFeed.links![0].toString());
+    ref.read(repositoryProvider).addFeed(newFeed);
+
+    atomFeed.items?.forEach((element) {
+      saveAtomItem(element, ref, feedId);
+    });
+  }
+
+  void saveRssItems(List<RssItem>? items, WidgetRef ref, String feedId) {
+    for (var i = 0; i < items!.length; i++) {
+      saveRssItem(items[i], ref, feedId);
+    }
+  }
+
+  void saveAtomItem(AtomItem item, WidgetRef ref, String feedId) {
+    String content = '';
+    if (item.content == null) {
+      if (item.media!.group!.description != null) {
+        content = item.media!.group!.description!.value.toString();
+      }
+    } else if (item.content!.isNotEmpty) {
+      content = item.content.toString();
+    } else if (item.summary!.isNotEmpty) {
+      content = item.summary.toString();
+    }
+
+    String articleLink = '';
+    if (item.links!.isNotEmpty) {
+      articleLink = item.links![0].href.toString();
+    }
+
+    Article article = Article(
+        feedId: feedId,
+        title: item.title.toString(),
+        link: articleLink,
+        unread: true,
+        content: content,
+        pubDate: DateTime.now());
+    ref.read(repositoryProvider).addArticle(article);
+  }
+
+  void saveAtomItems(List<AtomItem>? items, WidgetRef ref, String feedId) {
+    for (var i = 0; i < items!.length; i++) {
+      saveAtomItem(items[i], ref, feedId);
+    }
   }
 }

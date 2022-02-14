@@ -49,7 +49,7 @@ class Repository implements RepositoryInterface {
 
   // download feed from uri
   @override
-  Future<RssFeed> downloadFeed(Uri url) async {
+  Future<dynamic> downloadFeed(Uri url) async {
     return await remoteDataSource.getFeed(url);
   }
 
@@ -63,7 +63,7 @@ class Repository implements RepositoryInterface {
   List<Article> getArticlesByFeed(Feed feed) {
     return Hive.box<Article>('articleBox')
         .values
-        .where((element) => element.siteUrl == feed.siteUrl)
+        .where((element) => element.feedId == feed.feedId)
         .toList();
   }
 
@@ -71,8 +71,8 @@ class Repository implements RepositoryInterface {
     return Hive.box<Article>('articleBox')
         .values
         .toList()
-        .where((article) =>
-            (article.link == url && article.siteUrl == feed.siteUrl))
+        .where(
+            (article) => (article.link == url && article.feedId == feed.feedId))
         .toList();
   }
 
@@ -84,8 +84,8 @@ class Repository implements RepositoryInterface {
     // TODO check if exists
     final currentArticles = Hive.box<Article>('articleBox')
         .values
-        .where((element) => (element.link == article.link &&
-            element.siteUrl == article.siteUrl))
+        .where((element) =>
+            (element.link == article.link && element.feedId == article.feedId))
         .toList();
     if (currentArticles.isEmpty) {
       // if not, lets add it
@@ -119,7 +119,7 @@ class Repository implements RepositoryInterface {
     var currentFeeds = getFeeds();
     for (var i = 0; i < results.length; i++) {
       final existing = currentFeeds
-          .firstWhereOrNull((element) => element.url == results[i].feedId);
+          .firstWhereOrNull((element) => element.feedId == results[i].feedId);
       if (existing == null) {
         continue;
       }

@@ -11,7 +11,7 @@ abstract class RepositoryInterface {
   void addFeed(Feed feed);
 
   //Future<List<Feed>> findFeeds(String searchText);
-  Future<RssFeed> downloadFeed(Uri url);
+  Future<dynamic> downloadFeed(Uri url);
 
   List<Article> getArticles();
 //  Article? getArticle(int id);
