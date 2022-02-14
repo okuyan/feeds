@@ -36,7 +36,8 @@ dependencies:
   go_router: ^3.0.1
   provider: ^6.0.2
   google_fonts: ^2.2.0
-  webfeed: ^0.7.0
+  webfeed:
+    path: ../webfeed
   logging: ^1.0.2
   http: ^0.13.4
   url_launcher: ^6.0.18
@@ -48,7 +49,6 @@ dependencies:
   collection: ^1.15.0
   flutter_hooks: ^0.18.2
   hooks_riverpod: ^2.0.0-dev.0
-  get_it: ^7.2.0
   chopper: ^4.0.5
   json_annotation: ^4.4.0
 

@@ -17,7 +17,7 @@ class ArticleAdapter extends TypeAdapter<Article> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Article(
-      siteUrl: fields[0] as String,
+      feedId: fields[0] as String,
       title: fields[1] as String,
       link: fields[2] as String,
       unread: fields[3] as bool,
@@ -31,7 +31,7 @@ class ArticleAdapter extends TypeAdapter<Article> {
     writer
       ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.siteUrl)
+      ..write(obj.feedId)
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)

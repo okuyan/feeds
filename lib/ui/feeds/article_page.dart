@@ -26,7 +26,7 @@ class ArticlePage extends ConsumerWidget {
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(7),
+        //padding: const EdgeInsets.all(7),
         children: [
           InkWell(
             child: Padding(
@@ -43,14 +43,13 @@ class ArticlePage extends ConsumerWidget {
                 selectedArticle.pubDate.toString(),
                 style: const TextStyle(fontSize: 11),
               )),
-          Expanded(
-              child: Padding(
+          Padding(
             padding: const EdgeInsets.all(15.0),
             child: Text(
               selectedArticle.content.toString(),
               style: FeedsTheme.lightTextTheme.bodyText2,
             ),
-          ))
+          )
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

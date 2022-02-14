@@ -15,7 +15,7 @@ class FeedsPage extends HookConsumerWidget {
     final feeds = ref.watch(feedViewModelProvider);
 
     final snapshot = useFuture(useMemoized(() {
-      return ref.read(feedViewModelProvider.notifier).fetchFeeds();
+      return ref.read(feedViewModelProvider.notifier).fetchFeeds(ref);
     }));
 
     return Scaffold(

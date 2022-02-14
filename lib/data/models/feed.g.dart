@@ -18,9 +18,9 @@ class FeedAdapter extends TypeAdapter<Feed> {
     };
     return Feed(
       title: fields[0] as String,
-      url: fields[1] as String,
+      feedId: fields[1] as String,
       articleCount: fields[2] as int,
-      siteUrl: fields[3] as String,
+      website: fields[3] as String,
     );
   }
 
@@ -31,11 +31,11 @@ class FeedAdapter extends TypeAdapter<Feed> {
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.url)
+      ..write(obj.feedId)
       ..writeByte(2)
       ..write(obj.articleCount)
       ..writeByte(3)
-      ..write(obj.siteUrl);
+      ..write(obj.website);
   }
 
   @override
