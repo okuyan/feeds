@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:equatable/equatable.dart';
 
 part 'article.g.dart';
 
-@immutable
+//@immutable
 @HiveType(typeId: 2)
-class Article extends Equatable {
+class Article extends HiveObject {
   @HiveField(0)
   final String feedId;
   @HiveField(1)
@@ -22,17 +20,16 @@ class Article extends Equatable {
   @HiveField(6)
   final String? youTubeVideoId;
 
-  const Article({
+  Article({
     required this.feedId,
     required this.title,
     required this.link,
     required this.unread,
-    this.content,
     required this.pubDate,
+    this.content,
     this.youTubeVideoId,
   });
 
-  @override
   List<Object?> get props =>
       [feedId, title, link, unread, content, pubDate, youTubeVideoId];
 }

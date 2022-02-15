@@ -1,6 +1,5 @@
 import 'package:feeds/data/remote/remote_data_source.dart';
 import 'package:feeds/data/repository_interface.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:feeds/data/remote/service/feedly_service.dart';
@@ -10,7 +9,6 @@ import 'models/models.dart';
 
 import 'package:feeds/data/remote/result.dart';
 import 'package:chopper/chopper.dart';
-import 'package:feeds/data/remote/result.dart';
 import 'package:collection/collection.dart';
 
 final repositoryProvider = Provider((ref) => Repository(ref.read));
@@ -60,6 +58,7 @@ class Repository implements RepositoryInterface {
     return Hive.box<Article>('articleBox').values.toList();
   }
 
+  @override
   List<Article> getArticlesByFeed(Feed feed) {
     return Hive.box<Article>('articleBox')
         .values
@@ -67,6 +66,7 @@ class Repository implements RepositoryInterface {
         .toList();
   }
 
+  @override
   List<Article> getArticlesByUrl(Feed feed, String url) {
     return Hive.box<Article>('articleBox')
         .values
@@ -99,14 +99,6 @@ class Repository implements RepositoryInterface {
 //    await _localDataSource.init();
   }
 
-  Future syncFeeds() async {
-    // get all feeds from local
-    // if no feeds in local
-    // add test feed
-
-    // loop through to fetch the latest rss feed
-  }
-
   @override
   Future<Response<Result<FeedlyResults>>> searchFeeds(String query) async {
     // call feedly service
@@ -137,6 +129,26 @@ class Repository implements RepositoryInterface {
         .values
         .toList()
         .firstWhereOrNull((element) => element.feedId == feedId);
+  }
+
+  @override
+  void deleteFeed(Feed feed) {
+    final data = Hive.box<Feed>('feedBox')
+        .values
+        .toList()
+        .firstWhereOrNull((element) => element.feedId == feed.feedId);
+    if (data != null) {
+      data.delete();
+    }
+    final articles = Hive.box<Article>('articleBox')
+        .values
+        .toList()
+        .where((element) => element.feedId == feed.feedId);
+
+    if (articles.isNotEmpty) {
+      final keys = articles.map((element) => element.key);
+      Hive.box<Article>('articleBox').deleteAll(keys);
+    }
   }
 
   // close local db

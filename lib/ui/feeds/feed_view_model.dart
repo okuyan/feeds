@@ -34,6 +34,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   void remove(Feed target) {
     // TODO removing data from repository
+    repository.deleteFeed(target);
 
     state = state.where((feed) => feed.feedId != target.feedId).toList();
   }
@@ -49,7 +50,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
     if (_feeds.isEmpty) {
       // DL sample feed
-      const sampleFeed = Feed(
+      final sampleFeed = Feed(
           title: 'just sal\'s blog on nonbei alley',
           feedId: 'https://blog.salrashid.dev/index.xml',
           articleCount: 0,
