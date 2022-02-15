@@ -3,6 +3,7 @@ import 'package:feeds/data/models/models.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:feeds/utils/StripHtml.dart';
 
 final feedViewModelProvider =
     StateNotifierProvider<FeedViewModel, List<Feed>>((ref) {
@@ -132,6 +133,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   void saveRssItem(RssItem item, WidgetRef ref, String feedId) {
     String content = item.description ?? item.content!.value;
+    content = stripHtmlIfNeeded(content);
 
     String articleLink = item.link.toString();
     Article article = Article(
@@ -145,8 +147,6 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
   }
 
   void saveAtomFeed(AtomFeed atomFeed, WidgetRef ref, String feedId) {
-    print(atomFeed);
-
     ref.read(feedViewModelProvider.notifier).add(
         atomFeed.title.toString(), feedId, atomFeed.items?.length ?? 0, feedId);
     final Feed newFeed = Feed(
@@ -187,6 +187,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     } else if (item.summary!.isNotEmpty) {
       content = item.summary.toString();
     }
+    content = stripHtmlIfNeeded(content);
 
     String articleLink = '';
     if (item.links!.isNotEmpty) {
