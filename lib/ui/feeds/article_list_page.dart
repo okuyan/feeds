@@ -42,7 +42,8 @@ class ArticleListPage extends ConsumerWidget {
                       _articles[index];
                   // Check if article has youtube video id,
                   // if so, Navigate to youtube video player page
-                  if (_articles[index].youTubeVideoId != null) {
+                  if (_articles[index].youTubeVideoId != null &&
+                      _articles[index].youTubeVideoId != '') {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const YouTubeView()));
                   } else {

@@ -77,8 +77,8 @@ class AddFeedPage extends HookConsumerWidget {
   }
 
   Widget _buildFeedList(
-      WidgetRef ref, search, showSearchResult, showIndicator) {
-    final feeds = ref.watch(searchResultFeedProvider(search));
+      WidgetRef ref, String searchStr, showSearchResult, showIndicator) {
+    final feeds = ref.watch(searchResultFeedProvider(searchStr));
     final List<FeedlyResult> resultList = [];
 
     return Visibility(
@@ -89,8 +89,13 @@ class AddFeedPage extends HookConsumerWidget {
             error: (err, stack) => Text('error!!!!'),
             data: (feeds) {
               print('done........');
+
               if (feeds == null) {
                 return const SizedBox.shrink();
+              }
+
+              if (feeds is RssFeed || feeds is AtomFeed) {
+                return Expanded(child: _buildFeedRow(ref, feeds, searchStr));
               }
 
               final results = (feeds.body as Success).value;
@@ -99,6 +104,42 @@ class AddFeedPage extends HookConsumerWidget {
                 child: _buildSearchResultList(ref, resultList, showIndicator),
               );
             }));
+  }
+
+  Widget _buildFeedRow(WidgetRef ref, feed, String feedId) {
+    final _followed = useState(false);
+
+    // Check if already followed
+    final isFollowed = ref.read(repositoryProvider).findFeed(feedId);
+    if (isFollowed != null) {
+      _followed.value = true;
+    }
+
+    void _followFeed(ref, feed, feedId) {
+      if (feed is RssFeed) {
+        ref.read(feedViewModelProvider.notifier).saveRssFeed(feed, ref, feedId);
+      } else if (feed is AtomFeed) {
+        ref
+            .read(feedViewModelProvider.notifier)
+            .saveAtomFeed(feed, ref, feedId);
+      }
+      _followed.value = true;
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      children: [
+        ListTile(
+          title: Text(feed.title),
+          trailing: _followed.value ? Icon(Icons.done) : Icon(Icons.add),
+          onTap: () {
+            if (_followed.value == false) {
+              _followFeed(ref, feed, feedId.trim());
+            }
+          },
+        ),
+      ],
+    );
   }
 
   Widget _buildSearchResultList(ref, resultList, showIndicator) {
