@@ -14,6 +14,9 @@ abstract class RepositoryInterface {
   Future<dynamic> downloadFeed(Uri url);
 
   List<Article> getArticles();
+  List<Article> getArticlesByFeed(Feed feed);
+  List<Article> getArticlesByUrl(Feed feed, String url);
+
 //  Article? getArticle(int id);
   void addArticle(Article article);
 
@@ -22,6 +25,8 @@ abstract class RepositoryInterface {
   Future<Response<Result<FeedlyResults>>> searchFeeds(String query);
 
   Feed? findFeed(String feedId);
+
+  void deleteFeed(Feed feed);
 
   void close();
 }

@@ -21,8 +21,8 @@ class ArticleAdapter extends TypeAdapter<Article> {
       title: fields[1] as String,
       link: fields[2] as String,
       unread: fields[3] as bool,
-      content: fields[4] as String?,
       pubDate: fields[5] as DateTime,
+      content: fields[4] as String?,
       youTubeVideoId: fields[6] as String?,
     );
   }

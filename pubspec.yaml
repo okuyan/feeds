@@ -52,6 +52,7 @@ dependencies:
   chopper: ^4.0.5
   json_annotation: ^4.4.0
   youtube_player_flutter: ^8.0.0
+  flutter_slidable: ^1.2.0
 
 dev_dependencies:
   flutter_test:
