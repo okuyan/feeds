@@ -131,6 +131,14 @@ class Repository implements RepositoryInterface {
     return response;
   }
 
+  @override
+  Feed? findFeed(String feedId) {
+    return Hive.box<Feed>('feedBox')
+        .values
+        .toList()
+        .firstWhereOrNull((element) => element.feedId == feedId);
+  }
+
   // close local db
   @override
   void close() {}

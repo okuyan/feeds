@@ -21,5 +21,7 @@ abstract class RepositoryInterface {
 
   Future<Response<Result<FeedlyResults>>> searchFeeds(String query);
 
+  Feed? findFeed(String feedId);
+
   void close();
 }
