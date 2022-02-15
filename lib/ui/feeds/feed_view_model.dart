@@ -169,9 +169,18 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   void saveAtomItem(AtomItem item, WidgetRef ref, String feedId) {
     String content = '';
+    String youTubeVideoId = '';
     if (item.content == null) {
       if (item.media!.group!.description != null) {
         content = item.media!.group!.description!.value.toString();
+      }
+
+      if (item.id != null) {
+        final reg = RegExp('yt:video:');
+        if (reg.hasMatch(item.id.toString())) {
+          youTubeVideoId =
+              item.id.toString().replaceFirst(RegExp('yt:video:'), '');
+        }
       }
     } else if (item.content!.isNotEmpty) {
       content = item.content.toString();
@@ -190,7 +199,8 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
         link: articleLink,
         unread: true,
         content: content,
-        pubDate: DateTime.now());
+        pubDate: DateTime.now(),
+        youTubeVideoId: youTubeVideoId);
     ref.read(repositoryProvider).addArticle(article);
   }
 

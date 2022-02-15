@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/ui/feeds/article_page.dart';
 import 'package:feeds/providers/app_providers.dart';
 import 'package:feeds/ui/feeds/article_list_view_model.dart';
+import 'package:feeds/ui/feeds/youtube_view.dart';
 
 class ArticleListPage extends ConsumerWidget {
   const ArticleListPage({Key? key}) : super(key: key);
@@ -39,8 +40,15 @@ class ArticleListPage extends ConsumerWidget {
                 onTap: () {
                   ref.read(selectedArticleProvider.notifier).state =
                       _articles[index];
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ArticlePage()));
+                  // Check if article has youtube video id,
+                  // if so, Navigate to youtube video player page
+                  if (_articles[index].youTubeVideoId != null) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const YouTubeView()));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ArticlePage()));
+                  }
                 },
                 trailing: const Icon(Icons.arrow_right),
               );
