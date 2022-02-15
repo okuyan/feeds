@@ -20,7 +20,7 @@ class Article extends Equatable {
   @HiveField(5)
   final DateTime pubDate;
   @HiveField(6)
-  final String? youtubeVideo;
+  final String? youTubeVideoId;
 
   const Article({
     required this.feedId,
@@ -29,10 +29,10 @@ class Article extends Equatable {
     required this.unread,
     this.content,
     required this.pubDate,
-    this.youtubeVideo,
+    this.youTubeVideoId,
   });
 
   @override
   List<Object?> get props =>
-      [feedId, title, link, unread, content, pubDate, youtubeVideo];
+      [feedId, title, link, unread, content, pubDate, youTubeVideoId];
 }
