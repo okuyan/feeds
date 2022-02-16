@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import 'package:feeds/feeds_theme.dart';
 import 'package:feeds/providers/app_providers.dart';
@@ -18,6 +19,8 @@ class ArticlePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedArticle = ref.watch(selectedArticleProvider);
+    final pubDate =
+        DateFormat.yMMMEd().format(selectedArticle!.pubDate as DateTime);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +43,7 @@ class ArticlePage extends ConsumerWidget {
           Padding(
               padding: EdgeInsets.all(15),
               child: Text(
-                selectedArticle.pubDate.toString(),
+                pubDate,
                 style: const TextStyle(fontSize: 11),
               )),
           Padding(

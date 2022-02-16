@@ -16,7 +16,7 @@ class Article extends HiveObject {
   @HiveField(4)
   final String? content;
   @HiveField(5)
-  final DateTime pubDate;
+  final DateTime? pubDate;
   @HiveField(6)
   final String? youTubeVideoId;
 
