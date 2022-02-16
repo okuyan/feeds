@@ -4,6 +4,7 @@ import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/utils/StripHtml.dart';
+import 'package:feeds/utils/DateTimeUtils.dart';
 
 final feedViewModelProvider =
     StateNotifierProvider<FeedViewModel, List<Feed>>((ref) {
@@ -33,9 +34,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
   }
 
   void remove(Feed target) {
-    // TODO removing data from repository
     repository.deleteFeed(target);
-
     state = state.where((feed) => feed.feedId != target.feedId).toList();
   }
 
@@ -137,13 +136,20 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     content = stripHtmlIfNeeded(content);
 
     String articleLink = item.link.toString();
+    DateTime? pubDate;
+    if (item.pubDate != null) {
+      pubDate = item.pubDate as DateTime;
+    } else if (item.dc!.date != null) {
+      pubDate = item.dc!.date as DateTime;
+    }
+
     Article article = Article(
         feedId: feedId,
         title: item.title.toString(),
         link: articleLink,
         unread: true,
         content: content,
-        pubDate: DateTime.now());
+        pubDate: pubDate);
     ref.read(repositoryProvider).addArticle(article);
   }
 
@@ -201,7 +207,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
         link: articleLink,
         unread: true,
         content: content,
-        pubDate: DateTime.now(),
+        pubDate: item.updated as DateTime,
         youTubeVideoId: youTubeVideoId);
     ref.read(repositoryProvider).addArticle(article);
   }
@@ -210,5 +216,9 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     for (var i = 0; i < items!.length; i++) {
       saveAtomItem(items[i], ref, feedId);
     }
+  }
+
+  DateTime parsePubDate(String pubDate) {
+    return DateUtils().parseRfc822Date(pubDate);
   }
 }
