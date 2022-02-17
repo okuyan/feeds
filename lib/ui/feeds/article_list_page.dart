@@ -38,8 +38,13 @@ class ArticleListPage extends ConsumerWidget {
               return ListTile(
                 title: Text(_articles[index].title),
                 onTap: () {
+                  // TODO toggle unread
+                  final hasReadArticle = ref
+                      .read(articleListProvider.notifier)
+                      .markHasRead(_articles[index]);
                   ref.read(selectedArticleProvider.notifier).state =
-                      _articles[index];
+                      hasReadArticle;
+
                   // Check if article has youtube video id,
                   // if so, Navigate to youtube video player page
                   if (_articles[index].youTubeVideoId != null &&

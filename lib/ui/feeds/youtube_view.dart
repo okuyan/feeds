@@ -6,6 +6,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:feeds/feeds_theme.dart';
 import 'package:feeds/providers/app_providers.dart';
+import 'package:feeds/ui/feeds/article_list_view_model.dart';
 
 class YouTubeView extends ConsumerWidget {
   const YouTubeView({Key? key}) : super(key: key);
@@ -21,6 +22,13 @@ class YouTubeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedArticle = ref.watch(selectedArticleProvider);
 
+    Icon bookmarkedIcon = selectedArticle!.bookmarked
+        ? Icon(Icons.star)
+        : Icon(Icons.star_outline);
+    Icon unreadIcon = selectedArticle.unread
+        ? Icon(Icons.circle_outlined)
+        : Icon(Icons.circle);
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.black38),
@@ -34,7 +42,7 @@ class YouTubeView extends ConsumerWidget {
             child: Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Text(
-                  selectedArticle!.title,
+                  selectedArticle.title,
                   style: FeedsTheme.lightTextTheme.headline1,
                 )),
             onTap: () => launchArticle(selectedArticle.link),
@@ -59,17 +67,32 @@ class YouTubeView extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        //selectedItemColor: Theme.of(context).colorScheme.secondary,
+        onTap: (index) {
+          if (index == 0) {
+            final toggledArticle = ref
+                .read(articleListProvider.notifier)
+                .toggleUnread(selectedArticle);
+            ref.read(selectedArticleProvider.notifier).state = toggledArticle;
+          } else if (index == 1) {
+            // TODO toggle bookmark
+            final toggledArticle = ref
+                .read(articleListProvider.notifier)
+                .toggleBookmarked(selectedArticle);
+            // TODO update state
+            ref.read(selectedArticleProvider.notifier).state = toggledArticle;
+          } else if (index == 2) {}
+        },
+        selectedItemColor: Colors.black54,
+        unselectedItemColor: Colors.black54,
         type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.article_outlined,
-            ),
-            label: 'hoge',
+            icon: unreadIcon,
+            label: 'Unread',
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.mark_as_unread), label: 'hoge'),
+          BottomNavigationBarItem(icon: bookmarkedIcon, label: 'Bookmark'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.ios_share), label: 'Share')
         ],
       ),
     );

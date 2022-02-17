@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:feeds/ui/feeds/feeds_page.dart';
 import 'package:feeds/ui/unread/unread_page.dart';
-import 'package:feeds/ui/starred/starred_page.dart';
+import 'package:feeds/ui/bookmarks/bookmarks_page.dart';
 import 'package:feeds/ui/feeds/add_feed_page.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,7 +28,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   static List<Widget> pages = [
     const FeedsPage(),
     const UnreadPage(),
-    const StarredPage(),
+    const BookmarksPage(),
   ];
 
   @override
@@ -52,8 +52,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       case FeedsTab.unread:
         title = 'Unread';
         break;
-      case FeedsTab.starred:
-        title = 'Starred';
+      case FeedsTab.bookmarks:
+        title = 'Bookmarks';
         break;
       default:
         title = 'Unread';
@@ -111,7 +111,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.star),
-              label: 'Starred',
+              label: 'Bookmarks',
             ),
           ],
         ),
