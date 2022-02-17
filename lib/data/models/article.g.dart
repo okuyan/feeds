@@ -24,13 +24,14 @@ class ArticleAdapter extends TypeAdapter<Article> {
       pubDate: fields[5] as DateTime?,
       content: fields[4] as String?,
       youTubeVideoId: fields[6] as String?,
+      bookmarked: fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Article obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.feedId)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class ArticleAdapter extends TypeAdapter<Article> {
       ..writeByte(5)
       ..write(obj.pubDate)
       ..writeByte(6)
-      ..write(obj.youTubeVideoId);
+      ..write(obj.youTubeVideoId)
+      ..writeByte(7)
+      ..write(obj.bookmarked);
   }
 
   @override

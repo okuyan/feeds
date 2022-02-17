@@ -10,5 +10,5 @@ final selectedTabProvider = StateProvider((ref) => FeedsTab.allFeeds);
 class FeedsTab {
   static const int allFeeds = 0;
   static const int unread = 1;
-  static const int starred = 2;
+  static const int bookmarks = 2;
 }

@@ -28,5 +28,7 @@ abstract class RepositoryInterface {
 
   void deleteFeed(Feed feed);
 
+  void updateArticle(Article article);
+
   void close();
 }

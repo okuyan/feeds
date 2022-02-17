@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:feeds/data/remote/remote_data_source.dart';
 import 'package:feeds/data/repository_interface.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -148,6 +150,18 @@ class Repository implements RepositoryInterface {
     if (articles.isNotEmpty) {
       final keys = articles.map((element) => element.key);
       Hive.box<Article>('articleBox').deleteAll(keys);
+    }
+  }
+
+  @override
+  void updateArticle(Article article) {
+    final data = Hive.box<Article>('articleBox')
+        .values
+        .toList()
+        .firstWhereOrNull((element) =>
+            element.feedId == article.feedId && element.link == article.link);
+    if (data != null) {
+      Hive.box<Article>('articleBox').putAt(data.key, article);
     }
   }
 

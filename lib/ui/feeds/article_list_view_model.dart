@@ -34,4 +34,49 @@ class ArticleList extends StateNotifier<List<Article>> {
   void replaceArticles(List<Article> articles) {
     state = [...articles];
   }
+
+  Article markHasRead(Article target) {
+    final hasReadArticle = target.updateUnread(true);
+    state = [
+      for (final article in state)
+        if (article.link == target.link && article.feedId == target.feedId)
+          hasReadArticle
+        else
+          article
+    ];
+
+    // Update article in repository
+    repository.updateArticle(hasReadArticle);
+    return hasReadArticle;
+  }
+
+  Article toggleUnread(Article target) {
+    final toggledArticle = target.updateUnread(!target.unread);
+    state = [
+      for (final article in state)
+        if (article.link == target.link && article.feedId == target.feedId)
+          toggledArticle
+        else
+          article
+    ];
+
+    // Update article in repository
+    repository.updateArticle(toggledArticle);
+    return toggledArticle;
+  }
+
+  Article toggleBookmarked(Article target) {
+    final toggledArticle = target.updateBookmarked(!target.bookmarked);
+    state = [
+      for (final article in state)
+        if (article.link == target.link && article.feedId == target.feedId)
+          toggledArticle
+        else
+          article
+    ];
+
+    // Update article in repository
+    repository.updateArticle(toggledArticle);
+    return toggledArticle;
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class StarredPage extends StatelessWidget {
-  const StarredPage({Key? key}) : super(key: key);
+class BookmarksPage extends StatelessWidget {
+  const BookmarksPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

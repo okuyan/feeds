@@ -19,17 +19,51 @@ class Article extends HiveObject {
   final DateTime? pubDate;
   @HiveField(6)
   final String? youTubeVideoId;
+  @HiveField(7)
+  final bool bookmarked;
 
-  Article({
-    required this.feedId,
-    required this.title,
-    required this.link,
-    required this.unread,
-    required this.pubDate,
-    this.content,
-    this.youTubeVideoId,
-  });
+  Article(
+      {required this.feedId,
+      required this.title,
+      required this.link,
+      required this.unread,
+      required this.pubDate,
+      this.content,
+      this.youTubeVideoId,
+      this.bookmarked = false});
 
-  List<Object?> get props =>
-      [feedId, title, link, unread, content, pubDate, youTubeVideoId];
+  List<Object?> get props => [
+        feedId,
+        title,
+        link,
+        unread,
+        content,
+        pubDate,
+        youTubeVideoId,
+        bookmarked
+      ];
+
+  Article updateUnread(bool unread) {
+    return Article(
+        feedId: feedId,
+        title: title,
+        link: link,
+        unread: unread,
+        pubDate: pubDate,
+        content: content,
+        youTubeVideoId: youTubeVideoId,
+        bookmarked: bookmarked);
+  }
+
+  Article updateBookmarked(bool bookmarked) {
+    return Article(
+        feedId: feedId,
+        title: title,
+        link: link,
+        unread: unread,
+        pubDate: pubDate,
+        content: content,
+        youTubeVideoId: youTubeVideoId,
+        bookmarked: bookmarked);
+  }
 }
