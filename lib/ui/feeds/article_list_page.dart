@@ -36,8 +36,13 @@ class ArticleListPage extends ConsumerWidget {
         body: ListView.builder(
             itemCount: _articles.length,
             itemBuilder: (BuildContext _listContext, int index) {
+              final opacity = _articles[index].unread ? 1.0 : 0.4;
               return ListTile(
-                title: Text(_articles[index].title),
+                title: Opacity(
+                    opacity: opacity,
+                    child: Text(
+                      _articles[index].title,
+                    )),
                 onTap: () {
                   // TODO toggle unread
                   final hasReadArticle = ref
