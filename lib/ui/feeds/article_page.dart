@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:feeds/feeds_theme.dart';
 import 'package:feeds/providers/app_providers.dart';
+import 'package:feeds/ui/bookmarks/bookmarks_view_model.dart';
 
 class ArticlePage extends ConsumerWidget {
   const ArticlePage({Key? key}) : super(key: key);
@@ -70,11 +71,12 @@ class ArticlePage extends ConsumerWidget {
                 .toggleUnread(selectedArticle);
             ref.read(selectedArticleProvider.notifier).state = toggledArticle;
           } else if (index == 1) {
-            // TODO toggle bookmark
+            // toggle bookmark
             final toggledArticle = ref
                 .read(articleListProvider.notifier)
                 .toggleBookmarked(selectedArticle);
-            // TODO update state
+            ref.read(bookmarksProvider.notifier).getBookmarks();
+            // update state
             ref.read(selectedArticleProvider.notifier).state = toggledArticle;
           } else if (index == 2) {}
         },

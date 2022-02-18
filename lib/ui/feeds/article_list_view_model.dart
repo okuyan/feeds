@@ -67,6 +67,7 @@ class ArticleList extends StateNotifier<List<Article>> {
 
   Article toggleBookmarked(Article target) {
     final toggledArticle = target.updateBookmarked(!target.bookmarked);
+
     state = [
       for (final article in state)
         if (article.link == target.link && article.feedId == target.feedId)
@@ -80,3 +81,10 @@ class ArticleList extends StateNotifier<List<Article>> {
     return toggledArticle;
   }
 }
+
+/*
+final bookmarkedArticles = Provider<List<Article>>((ref) {
+  final articles = ref.read(repositoryProvider).getArticles();
+  return articles.where((element) => element.bookmarked == true).toList();
+});
+*/
