@@ -1,4 +1,5 @@
 import 'package:feeds/ui/feeds/article_list_view_model.dart';
+import 'package:feeds/ui/unread/unread_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,8 +29,8 @@ class ArticlePage extends ConsumerWidget {
         ? Icon(Icons.star)
         : Icon(Icons.star_outline);
     Icon unreadIcon = selectedArticle.unread
-        ? Icon(Icons.circle_outlined)
-        : Icon(Icons.circle);
+        ? Icon(Icons.circle)
+        : Icon(Icons.circle_outlined);
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.black38),
@@ -70,6 +71,7 @@ class ArticlePage extends ConsumerWidget {
                 .read(articleListProvider.notifier)
                 .toggleUnread(selectedArticle);
             ref.read(selectedArticleProvider.notifier).state = toggledArticle;
+            ref.read(unreadProvider.notifier).getUnread();
           } else if (index == 1) {
             // toggle bookmark
             final toggledArticle = ref

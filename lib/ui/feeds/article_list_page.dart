@@ -1,3 +1,4 @@
+import 'package:feeds/ui/unread/unread_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -44,7 +45,6 @@ class ArticleListPage extends ConsumerWidget {
                       .markHasRead(_articles[index]);
                   ref.read(selectedArticleProvider.notifier).state =
                       hasReadArticle;
-
                   // Check if article has youtube video id,
                   // if so, Navigate to youtube video player page
                   if (_articles[index].youTubeVideoId != null &&
@@ -55,6 +55,7 @@ class ArticleListPage extends ConsumerWidget {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const ArticlePage()));
                   }
+                  ref.read(unreadProvider.notifier).getUnread();
                 },
                 trailing: const Icon(Icons.arrow_right),
               );

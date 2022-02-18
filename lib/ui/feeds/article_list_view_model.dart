@@ -36,7 +36,7 @@ class ArticleList extends StateNotifier<List<Article>> {
   }
 
   Article markHasRead(Article target) {
-    final hasReadArticle = target.updateUnread(true);
+    final hasReadArticle = target.updateUnread(false);
     state = [
       for (final article in state)
         if (article.link == target.link && article.feedId == target.feedId)
