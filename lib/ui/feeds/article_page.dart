@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:feeds/feeds_theme.dart';
 import 'package:feeds/providers/app_providers.dart';
@@ -80,7 +81,9 @@ class ArticlePage extends ConsumerWidget {
             ref.read(bookmarksProvider.notifier).getBookmarks();
             // update state
             ref.read(selectedArticleProvider.notifier).state = toggledArticle;
-          } else if (index == 2) {}
+          } else if (index == 2) {
+            Share.share(selectedArticle.link);
+          }
         },
         selectedItemColor: Colors.black54,
         unselectedItemColor: Colors.black54,
