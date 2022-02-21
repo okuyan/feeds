@@ -1,3 +1,4 @@
+import 'package:feeds/data/repository.dart';
 import 'package:feeds/ui/feeds/article_list_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,7 +17,8 @@ class FeedsPage extends HookConsumerWidget {
     final feeds = ref.watch(feedViewModelProvider);
 
     final snapshot = useFuture(useMemoized(() {
-      return ref.read(feedViewModelProvider.notifier).fetchFeeds(ref);
+      //return ref.read(feedViewModelProvider.notifier).fetchFeeds();
+      return ref.read(repositoryProvider).fetchFeeds();
     }));
 
     return Scaffold(

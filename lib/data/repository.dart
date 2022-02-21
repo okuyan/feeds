@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:feeds/data/remote/remote_data_source.dart';
 import 'package:feeds/data/repository_interface.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,6 +10,8 @@ import 'models/models.dart';
 import 'package:feeds/data/remote/result.dart';
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
+import 'package:feeds/utils/StripHtml.dart';
+import 'package:webfeed/webfeed.dart';
 
 final repositoryProvider = Provider((ref) => Repository(ref.read));
 
@@ -168,4 +168,141 @@ class Repository implements RepositoryInterface {
   // close local db
   @override
   void close() {}
+
+  Future<void> fetchFeeds() async {
+    final List<Feed> _feeds = getFeeds();
+    List<Article> oldArticles = getArticles();
+
+    for (final feed in _feeds) {
+      final feedData = await downloadFeed(Uri.parse(feed.feedId));
+      if (feedData.items!.isEmpty) {
+        continue;
+      }
+
+      // TODO update articleCount????
+      // articleCount should be the number of unread articles....
+
+      if (feedData is RssFeed) {
+        for (var i = 0; i < feedData.items!.length; i++) {
+          // Check if article already exists
+          Article? isExist = oldArticles
+              .firstWhereOrNull((old) => old.link == feedData.items![i].link);
+          // Check if the existing article is unread, if so, count up unread++
+          if (isExist != null && isExist.unread) {
+            continue;
+          }
+
+          saveRssItem(feedData.items![i], feed.feedId);
+        }
+      } else if (feedData is AtomFeed) {
+        for (var i = 0; i < feedData.items!.length; i++) {
+          // Check if article already exists
+          Article? isExist = oldArticles.firstWhereOrNull((old) =>
+              old.link.toString() == feedData.items![i].links![0].toString());
+          // Check if the existing article is unread, if so, count up unread++
+          if (isExist != null && isExist.unread) {
+            continue;
+          }
+          saveAtomItem(feedData.items![i], feed.feedId);
+        }
+      }
+    }
+  }
+
+  void saveRssFeed(RssFeed rssFeed, String feedUrl) {
+    final Feed newFeed = Feed(
+        title: rssFeed.title.toString(),
+        articleCount: rssFeed.items!.length,
+        feedId: feedUrl,
+        website: rssFeed.link.toString());
+    addFeed(newFeed);
+    rssFeed.items?.forEach((element) {
+      saveRssItem(element, feedUrl);
+    });
+  }
+
+  void saveRssItem(RssItem item, String feedId) {
+    String content = item.description ?? item.content!.value;
+    content = stripHtmlIfNeeded(content);
+
+    String articleLink = item.link.toString();
+    DateTime? pubDate;
+    if (item.pubDate != null) {
+      pubDate = item.pubDate as DateTime;
+    } else if (item.dc!.date != null) {
+      pubDate = item.dc!.date as DateTime;
+    }
+
+    Article article = Article(
+        feedId: feedId,
+        title: item.title.toString(),
+        link: articleLink,
+        unread: true,
+        content: content,
+        pubDate: pubDate);
+    addArticle(article);
+  }
+
+  void saveAtomFeed(AtomFeed atomFeed, String feedId) {
+    final Feed newFeed = Feed(
+        title: atomFeed.title.toString(),
+        articleCount: atomFeed.items!.length,
+        feedId: feedId,
+        website: atomFeed.links![0].toString());
+    addFeed(newFeed);
+
+    atomFeed.items?.forEach((element) {
+      saveAtomItem(element, feedId);
+    });
+  }
+
+  void saveRssItems(List<RssItem>? items, String feedId) {
+    for (var i = 0; i < items!.length; i++) {
+      saveRssItem(items[i], feedId);
+    }
+  }
+
+  void saveAtomItem(AtomItem item, String feedId) {
+    String content = '';
+    String youTubeVideoId = '';
+    if (item.content == null) {
+      if (item.media!.group!.description != null) {
+        content = item.media!.group!.description!.value.toString();
+      }
+
+      if (item.id != null) {
+        final reg = RegExp('yt:video:');
+        if (reg.hasMatch(item.id.toString())) {
+          youTubeVideoId =
+              item.id.toString().replaceFirst(RegExp('yt:video:'), '');
+        }
+      }
+    } else if (item.content!.isNotEmpty) {
+      content = item.content.toString();
+    } else if (item.summary!.isNotEmpty) {
+      content = item.summary.toString();
+    }
+    content = stripHtmlIfNeeded(content);
+
+    String articleLink = '';
+    if (item.links!.isNotEmpty) {
+      articleLink = item.links![0].href.toString();
+    }
+
+    Article article = Article(
+        feedId: feedId,
+        title: item.title.toString(),
+        link: articleLink,
+        unread: true,
+        content: content,
+        pubDate: item.updated as DateTime,
+        youTubeVideoId: youTubeVideoId);
+    addArticle(article);
+  }
+
+  void saveAtomItems(List<AtomItem>? items, WidgetRef ref, String feedId) {
+    for (var i = 0; i < items!.length; i++) {
+      saveAtomItem(items[i], feedId);
+    }
+  }
 }

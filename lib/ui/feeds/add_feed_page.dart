@@ -8,8 +8,6 @@ import 'package:feeds/data/remote/result.dart';
 import 'package:feeds/ui/feeds/feed_view_model.dart';
 import 'package:webfeed/webfeed.dart';
 
-import 'package:feeds/utils/DateTimeUtils.dart' as DateTimeUtils;
-
 class AddFeedPage extends HookConsumerWidget {
   const AddFeedPage({Key? key}) : super(key: key);
 
@@ -117,11 +115,9 @@ class AddFeedPage extends HookConsumerWidget {
 
     void _followFeed(ref, feed, feedId) {
       if (feed is RssFeed) {
-        ref.read(feedViewModelProvider.notifier).saveRssFeed(feed, ref, feedId);
+        ref.read(repositoryProvider).saveRssFeed(feed, feedId);
       } else if (feed is AtomFeed) {
-        ref
-            .read(feedViewModelProvider.notifier)
-            .saveAtomFeed(feed, ref, feedId);
+        ref.read(repositoryProvider).saveAtomFeed(feed, feedId);
       }
       _followed.value = true;
     }
@@ -157,19 +153,21 @@ class AddFeedPage extends HookConsumerWidget {
     // download feed
     final feed =
         await ref.read(repositoryProvider).downloadFeed(Uri.parse(item.feedId));
+    int articleCount = 0;
 
     if (feed is RssFeed) {
-      ref
-          .read(feedViewModelProvider.notifier)
-          .saveRssFeed(feed, ref, item.feedId);
+      ref.read(repositoryProvider).saveRssFeed(feed, item.feedId);
+      articleCount = feed.items!.length;
     } else if (feed is AtomFeed) {
-      ref
-          .read(feedViewModelProvider.notifier)
-          .saveAtomFeed(feed, ref, item.feedId);
+      ref.read(repositoryProvider).saveAtomFeed(feed, item.feedId);
+      articleCount = feed.items!.length;
     }
 
     item.isFollowed = true;
     showIndicator.value = false;
+    ref
+        .read(feedViewModelProvider.notifier)
+        .add(item.title, item.feedId, articleCount, item.website);
   }
 
   Widget _buildItemTile(ref, item, showIndicator) {
