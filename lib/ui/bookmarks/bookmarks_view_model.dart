@@ -9,18 +9,18 @@ final bookmarksProvider =
       .getArticles()
       .where((element) => element.bookmarked == true)
       .toList();
-  return BookmakedList(
-      repository: ref.read(repositoryProvider), initialArticles: bookmarks);
+  return BookmakedList(ref: ref, initialArticles: bookmarks);
 });
 
 class BookmakedList extends StateNotifier<List<Article>> {
-  BookmakedList({required this.repository, List<Article>? initialArticles})
+  BookmakedList({required this.ref, List<Article>? initialArticles})
       : super(initialArticles ?? []);
 
-  final Repository repository;
+  final Ref ref;
 
   void getBookmarks() {
-    final bookmarks = repository
+    final bookmarks = ref
+        .read(repositoryProvider)
         .getArticles()
         .toList()
         .where((element) => element.bookmarked == true);

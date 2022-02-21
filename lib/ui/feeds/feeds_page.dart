@@ -14,11 +14,11 @@ class FeedsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final feeds = ref.watch(feedViewModelProvider);
-
+    /*
     final snapshot = useFuture(useMemoized(() {
-      return ref.read(feedViewModelProvider.notifier).fetchFeeds(ref);
+      return ref.read(feedViewModelProvider.notifier).fetchFeeds();
     }));
-
+    */
     return Scaffold(
       body: (feeds.isNotEmpty)
           ? ListView.builder(

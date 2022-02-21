@@ -1,4 +1,5 @@
 import 'package:feeds/providers/app_providers.dart';
+import 'package:feeds/ui/feeds/feed_view_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:feeds/ui/feeds/feeds_page.dart';
@@ -82,6 +83,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
         body: RefreshIndicator(
+          onRefresh: () =>
+              ref.refresh(feedViewModelProvider.notifier).fetchFeeds(),
           displacement: 0.0,
           color: Colors.black54,
           backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
@@ -91,9 +94,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: pages,
             ),
           ),
-          onRefresh: () {
-            return Future.delayed(const Duration(seconds: 1));
-          },
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: selectedTab,

@@ -8,18 +8,18 @@ final unreadProvider = StateNotifierProvider<UnreadList, List<Article>>((ref) {
       .getArticles()
       .where((element) => element.unread == true)
       .toList();
-  return UnreadList(
-      repository: ref.read(repositoryProvider), initialArticles: bookmarks);
+  return UnreadList(ref: ref, initialArticles: bookmarks);
 });
 
 class UnreadList extends StateNotifier<List<Article>> {
-  UnreadList({required this.repository, List<Article>? initialArticles})
+  UnreadList({required this.ref, List<Article>? initialArticles})
       : super(initialArticles ?? []);
 
-  final Repository repository;
+  final Ref ref;
 
   void getUnread() {
-    final unread = repository
+    final unread = ref
+        .read(repositoryProvider)
         .getArticles()
         .toList()
         .where((element) => element.unread == true);

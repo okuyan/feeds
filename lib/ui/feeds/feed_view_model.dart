@@ -4,18 +4,19 @@ import 'package:webfeed/webfeed.dart';
 import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/utils/StripHtml.dart';
-import 'package:feeds/utils/DateTimeUtils.dart';
 
 final feedViewModelProvider =
     StateNotifierProvider<FeedViewModel, List<Feed>>((ref) {
-  return FeedViewModel(repository: ref.read(repositoryProvider));
+  final initialFeeds = ref.read(repositoryProvider).getFeeds();
+
+  return FeedViewModel(ref: ref, initialFeeds: initialFeeds);
 });
 
 class FeedViewModel extends StateNotifier<List<Feed>> {
-  FeedViewModel({required this.repository, List<Feed>? initialFeeds})
+  FeedViewModel({required this.ref, List<Feed>? initialFeeds})
       : super(initialFeeds ?? []);
 
-  final Repository repository;
+  final Ref ref;
 
   void add(
     String title,
@@ -34,7 +35,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
   }
 
   void remove(Feed target) {
-    repository.deleteFeed(target);
+    ref.read(repositoryProvider).deleteFeed(target);
     state = state.where((feed) => feed.feedId != target.feedId).toList();
   }
 
@@ -42,10 +43,8 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     state = [...feeds];
   }
 
-  Future<void> fetchFeeds(ref) async {
-    final List<Feed> _feeds = repository.getFeeds();
-    List<Article> _articles = [];
-    int _unread = 0;
+  Future<void> fetchFeeds() async {
+    final List<Feed> _feeds = ref.read(repositoryProvider).getFeeds();
 
     if (_feeds.isEmpty) {
       // DL sample feed
@@ -54,13 +53,14 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
           feedId: 'https://blog.salrashid.dev/index.xml',
           articleCount: 0,
           website: 'https://blog.salrashid.dev/');
-      final sample =
-          await repository.downloadFeed(Uri.parse(sampleFeed.feedId));
+      final sample = await ref
+          .read(repositoryProvider)
+          .downloadFeed(Uri.parse(sampleFeed.feedId));
 
       if (sample is RssFeed) {
-        saveRssFeed(sample, ref, sampleFeed.feedId);
+        saveRssFeed(sample, sampleFeed.feedId);
       } else if (sample is AtomFeed) {
-        saveAtomFeed(sample, ref, sampleFeed.feedId);
+        saveAtomFeed(sample, sampleFeed.feedId);
       }
 
       final newFeed = sampleFeed.updateArticleCount(sample.items.length);
@@ -68,13 +68,14 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
       // update state
       //add(newFeed.title, newFeed.feedId, newFeed.articleCount, newFeed.website);
 
-      _unread += newFeed.articleCount;
     } else {
-      List<Article> oldArticles = repository.getArticles();
+      List<Article> oldArticles = ref.read(repositoryProvider).getArticles();
       final List<Feed> updatedFeeds = [];
 
       for (final feed in _feeds) {
-        final feedData = await repository.downloadFeed(Uri.parse(feed.feedId));
+        final feedData = await ref
+            .read(repositoryProvider)
+            .downloadFeed(Uri.parse(feed.feedId));
         if (feedData.items!.isEmpty) {
           continue;
         }
@@ -93,11 +94,10 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
                 .firstWhereOrNull((old) => old.link == feedData.items![i].link);
             // Check if the existing article is unread, if so, count up unread++
             if (isExist != null && isExist.unread) {
-              _unread++;
               continue;
             }
 
-            saveRssItem(feedData.items![i], ref, feed.feedId);
+            saveRssItem(feedData.items![i], feed.feedId);
           }
         } else if (feedData is AtomFeed) {
           for (var i = 0; i < feedData.items!.length; i++) {
@@ -106,10 +106,9 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
                 old.link.toString() == feedData.items![i].links![0].toString());
             // Check if the existing article is unread, if so, count up unread++
             if (isExist != null && isExist.unread) {
-              _unread++;
               continue;
             }
-            saveAtomItem(feedData.items![i], ref, feed.feedId);
+            saveAtomItem(feedData.items![i], feed.feedId);
           }
         }
         replaceFeeds(updatedFeeds);
@@ -117,7 +116,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     }
   }
 
-  void saveRssFeed(RssFeed rssFeed, WidgetRef ref, String feedUrl) {
+  void saveRssFeed(RssFeed rssFeed, String feedUrl) {
     ref.read(feedViewModelProvider.notifier).add(rssFeed.title.toString(),
         feedUrl, rssFeed.items?.length ?? 0, rssFeed.link.toString());
     final Feed newFeed = Feed(
@@ -127,11 +126,11 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
         website: rssFeed.link.toString());
     ref.read(repositoryProvider).addFeed(newFeed);
     rssFeed.items?.forEach((element) {
-      saveRssItem(element, ref, feedUrl);
+      saveRssItem(element, feedUrl);
     });
   }
 
-  void saveRssItem(RssItem item, WidgetRef ref, String feedId) {
+  void saveRssItem(RssItem item, String feedId) {
     String content = item.description ?? item.content!.value;
     content = stripHtmlIfNeeded(content);
 
@@ -153,7 +152,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     ref.read(repositoryProvider).addArticle(article);
   }
 
-  void saveAtomFeed(AtomFeed atomFeed, WidgetRef ref, String feedId) {
+  void saveAtomFeed(AtomFeed atomFeed, String feedId) {
     ref.read(feedViewModelProvider.notifier).add(
         atomFeed.title.toString(), feedId, atomFeed.items?.length ?? 0, feedId);
     final Feed newFeed = Feed(
@@ -164,17 +163,17 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
     ref.read(repositoryProvider).addFeed(newFeed);
 
     atomFeed.items?.forEach((element) {
-      saveAtomItem(element, ref, feedId);
+      saveAtomItem(element, feedId);
     });
   }
 
-  void saveRssItems(List<RssItem>? items, WidgetRef ref, String feedId) {
+  void saveRssItems(List<RssItem>? items, String feedId) {
     for (var i = 0; i < items!.length; i++) {
-      saveRssItem(items[i], ref, feedId);
+      saveRssItem(items[i], feedId);
     }
   }
 
-  void saveAtomItem(AtomItem item, WidgetRef ref, String feedId) {
+  void saveAtomItem(AtomItem item, String feedId) {
     String content = '';
     String youTubeVideoId = '';
     if (item.content == null) {
@@ -214,11 +213,7 @@ class FeedViewModel extends StateNotifier<List<Feed>> {
 
   void saveAtomItems(List<AtomItem>? items, WidgetRef ref, String feedId) {
     for (var i = 0; i < items!.length; i++) {
-      saveAtomItem(items[i], ref, feedId);
+      saveAtomItem(items[i], feedId);
     }
-  }
-
-  DateTime parsePubDate(String pubDate) {
-    return DateUtils().parseRfc822Date(pubDate);
   }
 }

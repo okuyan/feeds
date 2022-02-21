@@ -1,8 +1,5 @@
-import 'package:feeds/data/remote/service/feedly_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/data/repository.dart';
-import 'package:chopper/chopper.dart';
-import 'package:feeds/data/remote/result.dart';
 import 'package:webfeed/webfeed.dart';
 
 final searchResultFeedProvider = FutureProvider.autoDispose

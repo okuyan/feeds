@@ -4,17 +4,17 @@ import 'package:feeds/data/repository.dart';
 
 final articleListProvider =
     StateNotifierProvider<ArticleList, List<Article>>((ref) {
-  return ArticleList(repository: ref.read(repositoryProvider));
+  return ArticleList(ref: ref);
 });
 
 class ArticleList extends StateNotifier<List<Article>> {
-  ArticleList({required this.repository, List<Article>? initialArticles})
+  ArticleList({required this.ref, List<Article>? initialArticles})
       : super(initialArticles ?? []);
 
-  final Repository repository;
+  final Ref ref;
 
   void getArticles(Feed feed) {
-    final articles = repository.getArticlesByFeed(feed);
+    final articles = ref.read(repositoryProvider).getArticlesByFeed(feed);
     state = [...articles];
   }
 
@@ -46,7 +46,7 @@ class ArticleList extends StateNotifier<List<Article>> {
     ];
 
     // Update article in repository
-    repository.updateArticle(hasReadArticle);
+    ref.read(repositoryProvider).updateArticle(hasReadArticle);
     return hasReadArticle;
   }
 
@@ -61,7 +61,7 @@ class ArticleList extends StateNotifier<List<Article>> {
     ];
 
     // Update article in repository
-    repository.updateArticle(toggledArticle);
+    ref.read(repositoryProvider).updateArticle(toggledArticle);
     return toggledArticle;
   }
 
@@ -77,14 +77,7 @@ class ArticleList extends StateNotifier<List<Article>> {
     ];
 
     // Update article in repository
-    repository.updateArticle(toggledArticle);
+    ref.read(repositoryProvider).updateArticle(toggledArticle);
     return toggledArticle;
   }
 }
-
-/*
-final bookmarkedArticles = Provider<List<Article>>((ref) {
-  final articles = ref.read(repositoryProvider).getArticles();
-  return articles.where((element) => element.bookmarked == true).toList();
-});
-*/
