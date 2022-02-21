@@ -115,9 +115,9 @@ class AddFeedPage extends HookConsumerWidget {
 
     void _followFeed(ref, feed, feedId) {
       if (feed is RssFeed) {
-        ref.read(feedViewModelProvider.notifier).saveRssFeed(feed, feedId);
+        ref.read(repositoryProvider).saveRssFeed(feed, feedId);
       } else if (feed is AtomFeed) {
-        ref.read(feedViewModelProvider.notifier).saveAtomFeed(feed, feedId);
+        ref.read(repositoryProvider).saveAtomFeed(feed, feedId);
       }
       _followed.value = true;
     }
@@ -153,15 +153,21 @@ class AddFeedPage extends HookConsumerWidget {
     // download feed
     final feed =
         await ref.read(repositoryProvider).downloadFeed(Uri.parse(item.feedId));
+    int articleCount = 0;
 
     if (feed is RssFeed) {
-      ref.read(feedViewModelProvider.notifier).saveRssFeed(feed, item.feedId);
+      ref.read(repositoryProvider).saveRssFeed(feed, item.feedId);
+      articleCount = feed.items!.length;
     } else if (feed is AtomFeed) {
-      ref.read(feedViewModelProvider.notifier).saveAtomFeed(feed, item.feedId);
+      ref.read(repositoryProvider).saveAtomFeed(feed, item.feedId);
+      articleCount = feed.items!.length;
     }
 
     item.isFollowed = true;
     showIndicator.value = false;
+    ref
+        .read(feedViewModelProvider.notifier)
+        .add(item.title, item.feedId, articleCount, item.website);
   }
 
   Widget _buildItemTile(ref, item, showIndicator) {

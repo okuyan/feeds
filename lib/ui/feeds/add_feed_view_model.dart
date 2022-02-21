@@ -16,11 +16,11 @@ final searchResultFeedProvider = FutureProvider.autoDispose
   final trimmed = searchString.trim();
   final feedUrl = Uri.tryParse(trimmed);
   if (feedUrl != null && feedUrl.isAbsolute) {
-    final feedData = await ref.read(repositoryProvider).downloadFeed(feedUrl);
+    final feedData = await ref.watch(repositoryProvider).downloadFeed(feedUrl);
     if (feedData is RssFeed || feedData is AtomFeed) {
       return feedData;
     }
   }
 
-  return await ref.read(repositoryProvider).searchFeeds(searchString);
+  return await ref.watch(repositoryProvider).searchFeeds(searchString);
 });

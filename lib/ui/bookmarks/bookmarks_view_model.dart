@@ -5,7 +5,7 @@ import 'package:feeds/data/repository.dart';
 final bookmarksProvider =
     StateNotifierProvider<BookmakedList, List<Article>>((ref) {
   final bookmarks = ref
-      .read(repositoryProvider)
+      .watch(repositoryProvider)
       .getArticles()
       .where((element) => element.bookmarked == true)
       .toList();

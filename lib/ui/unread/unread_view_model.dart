@@ -4,7 +4,7 @@ import 'package:feeds/data/repository.dart';
 
 final unreadProvider = StateNotifierProvider<UnreadList, List<Article>>((ref) {
   final bookmarks = ref
-      .read(repositoryProvider)
+      .watch(repositoryProvider)
       .getArticles()
       .where((element) => element.unread == true)
       .toList();

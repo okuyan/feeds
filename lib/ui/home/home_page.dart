@@ -1,3 +1,4 @@
+import 'package:feeds/data/repository.dart';
 import 'package:feeds/providers/app_providers.dart';
 import 'package:feeds/ui/feeds/feed_view_model.dart';
 import 'package:flutter/material.dart';
@@ -83,8 +84,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
         body: RefreshIndicator(
-          onRefresh: () =>
-              ref.refresh(feedViewModelProvider.notifier).fetchFeeds(),
+          onRefresh: () => ref.refresh(repositoryProvider).fetchFeeds(),
           displacement: 0.0,
           color: Colors.black54,
           backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
