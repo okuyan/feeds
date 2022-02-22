@@ -3,12 +3,19 @@ import 'package:feeds/data/models/models.dart';
 import 'package:feeds/data/repository.dart';
 
 final unreadProvider = StateNotifierProvider<UnreadList, List<Article>>((ref) {
-  final bookmarks = ref
+  final unreadArticles = ref
       .watch(repositoryProvider)
       .getArticles()
       .where((element) => element.unread == true)
       .toList();
-  return UnreadList(ref: ref, initialArticles: bookmarks);
+  unreadArticles.sort((b, a) {
+    if (b.pubDate is DateTime && a.pubDate is DateTime) {
+      return a.pubDate!.compareTo(b.pubDate as DateTime);
+    } else {
+      return 0;
+    }
+  });
+  return UnreadList(ref: ref, initialArticles: unreadArticles);
 });
 
 class UnreadList extends StateNotifier<List<Article>> {
@@ -22,7 +29,16 @@ class UnreadList extends StateNotifier<List<Article>> {
         .read(repositoryProvider)
         .getArticles()
         .toList()
-        .where((element) => element.unread == true);
+        .where((element) => element.unread == true)
+        .toList();
+
+    unread.sort((b, a) {
+      if (b.pubDate is DateTime && a.pubDate is DateTime) {
+        return a.pubDate!.compareTo(b.pubDate as DateTime);
+      } else {
+        return 0;
+      }
+    });
     state = [...unread];
   }
 }

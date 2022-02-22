@@ -1,10 +1,18 @@
+import 'package:feeds/providers/app_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:feeds/data/models/models.dart';
 import 'package:feeds/data/repository.dart';
 
 final articleListProvider =
     StateNotifierProvider<ArticleList, List<Article>>((ref) {
-  return ArticleList(ref: ref);
+  Feed? _selectedFeed = ref.watch(selectedFeedProvider);
+  List<Article> initialArticles = [];
+  if (_selectedFeed is Feed) {
+    List<Article> _articles =
+        ref.watch(repositoryProvider).getArticlesByFeed(_selectedFeed);
+    initialArticles = _articles;
+  }
+  return ArticleList(ref: ref, initialArticles: initialArticles);
 });
 
 class ArticleList extends StateNotifier<List<Article>> {
@@ -47,6 +55,9 @@ class ArticleList extends StateNotifier<List<Article>> {
 
     // Update article in repository
     ref.read(repositoryProvider).updateArticle(hasReadArticle);
+
+    // Update articleCount in feed
+    ref.read(repositoryProvider).updateArticleCount(target.feedId);
     return hasReadArticle;
   }
 
@@ -62,6 +73,10 @@ class ArticleList extends StateNotifier<List<Article>> {
 
     // Update article in repository
     ref.read(repositoryProvider).updateArticle(toggledArticle);
+
+    // TODO update articleCount
+    ref.read(repositoryProvider).updateArticleCount(toggledArticle.feedId);
+
     return toggledArticle;
   }
 

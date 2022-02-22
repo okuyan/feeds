@@ -161,13 +161,35 @@ class Repository implements RepositoryInterface {
         .firstWhereOrNull((element) =>
             element.feedId == article.feedId && element.link == article.link);
     if (data != null) {
-      Hive.box<Article>('articleBox').putAt(data.key, article);
+      Hive.box<Article>('articleBox').put(data.key, article);
     }
   }
 
   // close local db
   @override
   void close() {}
+
+  void updateArticleCount(String feedId) {
+    final unreadArticleCount = Hive.box<Article>('articleBox')
+        .values
+        .toList()
+        .where(
+            (article) => (article.feedId == feedId && article.unread == true))
+        .length;
+
+    final data = Hive.box<Feed>('feedBox')
+        .values
+        .toList()
+        .firstWhereOrNull((element) => element.feedId == feedId);
+    if (data != null) {
+      final updatedFeed = Feed(
+          articleCount: unreadArticleCount,
+          title: data.title,
+          feedId: data.feedId,
+          website: data.website);
+      Hive.box<Feed>('feedBox').put(data.key, updatedFeed);
+    }
+  }
 
   Future<void> fetchFeeds() async {
     final List<Feed> _feeds = getFeeds();
@@ -191,7 +213,6 @@ class Repository implements RepositoryInterface {
           if (isExist != null && isExist.unread) {
             continue;
           }
-
           saveRssItem(feedData.items![i], feed.feedId);
         }
       } else if (feedData is AtomFeed) {
@@ -206,6 +227,20 @@ class Repository implements RepositoryInterface {
           saveAtomItem(feedData.items![i], feed.feedId);
         }
       }
+
+      final unread = Hive.box<Article>('articleBox')
+          .values
+          .toList()
+          .where((element) =>
+              element.unread == true && element.feedId == feed.feedId)
+          .length;
+      // Update articleCount
+      Feed updated = Feed(
+          title: feed.title,
+          feedId: feed.feedId,
+          articleCount: unread,
+          website: feed.website);
+      Hive.box<Feed>('feedBox').put(feed.key, updated);
     }
   }
 
