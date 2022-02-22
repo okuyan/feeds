@@ -1,9 +1,6 @@
 import 'package:feeds/data/repository.dart';
 import 'package:feeds/data/models/models.dart';
-import 'package:webfeed/webfeed.dart';
-import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:feeds/utils/StripHtml.dart';
 
 final feedViewModelProvider =
     StateNotifierProvider<FeedViewModel, List<Feed>>((ref) {

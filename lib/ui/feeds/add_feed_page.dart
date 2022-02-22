@@ -165,9 +165,6 @@ class AddFeedPage extends HookConsumerWidget {
 
     item.isFollowed = true;
     showIndicator.value = false;
-    ref
-        .read(feedViewModelProvider.notifier)
-        .add(item.title, item.feedId, articleCount, item.website);
   }
 
   Widget _buildItemTile(ref, item, showIndicator) {

@@ -8,10 +8,8 @@ final searchResultFeedProvider = FutureProvider.autoDispose
   print(searchString);
 
   if (searchString.isEmpty) {
-    //return Future.delayed(const Duration(microseconds: 50), () => null);
     return null;
   }
-  ref.maintainState = true;
 
   final trimmed = searchString.trim();
   final feedUrl = Uri.tryParse(trimmed);
