@@ -32,6 +32,52 @@ class ArticleListPage extends ConsumerWidget {
           backgroundColor: const Color.fromRGBO(227, 225, 224, 1.0),
           title: Text(_title, style: const TextStyle(color: Colors.black)),
           elevation: 0,
+          actions: <Widget>[
+            Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                              height: 150,
+                              child: ListView(
+                                padding: const EdgeInsets.all(8),
+                                children: <Widget>[
+                                  ElevatedButton.icon(
+                                      onPressed: () {
+                                        // mark all as read
+                                        for (var i = 0;
+                                            i < _articles.length;
+                                            i++) {
+                                          ref
+                                              .read(
+                                                  articleListProvider.notifier)
+                                              .markHasRead(_articles[i]);
+                                        }
+                                        Navigator.pop(context);
+                                      },
+                                      icon: Icon(Icons.done_all),
+                                      label: Text('Mark all as read')),
+                                  ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      icon: Icon(
+                                          Icons.cancel_presentation_outlined),
+                                      label: Text('Cancel'))
+                                ],
+                              ));
+                        });
+                  },
+                  child: const Icon(
+                    Icons.done,
+                    size: 26.0,
+                    color: Colors.black54,
+                  ),
+                )),
+          ],
         ),
         body: ListView.builder(
             itemCount: _articles.length,

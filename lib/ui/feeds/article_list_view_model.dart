@@ -10,6 +10,13 @@ final articleListProvider =
   if (_selectedFeed is Feed) {
     List<Article> _articles =
         ref.watch(repositoryProvider).getArticlesByFeed(_selectedFeed);
+    _articles.sort((b, a) {
+      if (b.pubDate is DateTime && a.pubDate is DateTime) {
+        return a.pubDate!.compareTo(b.pubDate as DateTime);
+      } else {
+        return 0;
+      }
+    });
     initialArticles = _articles;
   }
   return ArticleList(ref: ref, initialArticles: initialArticles);
